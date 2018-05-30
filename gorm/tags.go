@@ -1,11 +1,8 @@
 package gorm
 
 import (
-	"errors"
-
 	app "github.com/dimdiden/portanizer_sop"
 	"github.com/jinzhu/gorm"
-	gormigrate "gopkg.in/gormigrate.v1"
 )
 
 type TagService struct {
@@ -17,7 +14,7 @@ var Open = gorm.Open
 func (s *TagService) GetByID(id string) (*app.Tag, error) {
 	var tag app.Tag
 	if s.DB.First(&tag, "id = ?", id).RecordNotFound() {
-		return nil, errors.New("Record not found")
+		return nil, app.ErrNotFound
 	}
 	return &tag, nil
 }
@@ -25,7 +22,7 @@ func (s *TagService) GetByID(id string) (*app.Tag, error) {
 func (s *TagService) GetByName(name string) (*app.Tag, error) {
 	var tag app.Tag
 	if s.DB.First(&tag, "name = ?", name).RecordNotFound() {
-		return nil, errors.New("Record not found")
+		return nil, app.ErrNotFound
 	}
 	return &tag, nil
 }
@@ -44,7 +41,10 @@ func (s *TagService) Create(tag app.Tag) (*app.Tag, error) {
 }
 
 func (s *TagService) Update(id string, tag app.Tag) (*app.Tag, error) {
-	if err := s.DB.Model(&tag).Where("id = ?", id).Updates(app.Tag{Name: tag.Name}).Error; err != nil {
+	if s.DB.First(&tag, "id = ?", id).RecordNotFound() {
+		return nil, app.ErrNotFound
+	}
+	if err := s.DB.Model(&tag).Updates(app.Tag{Name: tag.Name}).Error; err != nil {
 		return nil, err
 	}
 	return &tag, nil
@@ -53,25 +53,10 @@ func (s *TagService) Update(id string, tag app.Tag) (*app.Tag, error) {
 func (s *TagService) Delete(id string) error {
 	var tag app.Tag
 	if s.DB.First(&tag, "id = ?", id).RecordNotFound() {
-		return errors.New("Record not found")
+		return app.ErrNotFound
 	}
 	if err := s.DB.Delete(&tag).Error; err != nil {
 		return err
 	}
 	return nil
-}
-
-func RunMigrations(db *gorm.DB) error {
-	m := gormigrate.New(db, gormigrate.DefaultOptions, []*gormigrate.Migration{
-		{
-			ID: "initial",
-			Migrate: func(tx *gorm.DB) error {
-				return tx.AutoMigrate(&app.Tag{}).Error
-			},
-			Rollback: func(tx *gorm.DB) error {
-				return tx.DropTable(&app.Tag{}).Error
-			},
-		},
-	})
-	return m.Migrate()
 }
