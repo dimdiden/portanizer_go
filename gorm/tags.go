@@ -23,11 +23,11 @@ func (s *TagService) GetByID(id string) (*app.Tag, error) {
 }
 
 func (s *TagService) GetByName(name string) (*app.Tag, error) {
-	var tag *app.Tag
+	var tag app.Tag
 	if s.DB.First(&tag, "name = ?", name).RecordNotFound() {
 		return nil, errors.New("Record not found")
 	}
-	return tag, nil
+	return &tag, nil
 }
 
 func (s *TagService) GetList() ([]*app.Tag, error) {
@@ -41,6 +41,24 @@ func (s *TagService) Create(tag app.Tag) (*app.Tag, error) {
 		return nil, err
 	}
 	return &tag, nil
+}
+
+func (s *TagService) Update(id string, tag app.Tag) (*app.Tag, error) {
+	if err := s.DB.Model(&tag).Where("id = ?", id).Updates(app.Tag{Name: tag.Name}).Error; err != nil {
+		return nil, err
+	}
+	return &tag, nil
+}
+
+func (s *TagService) Delete(id string) error {
+	var tag app.Tag
+	if s.DB.First(&tag, "id = ?", id).RecordNotFound() {
+		return errors.New("Record not found")
+	}
+	if err := s.DB.Delete(&tag).Error; err != nil {
+		return err
+	}
+	return nil
 }
 
 func RunMigrations(db *gorm.DB) error {

@@ -33,4 +33,6 @@ func (s *Server) routes() {
 	s.router.HandleFunc("/tags/{id}", s.tags.Get).Methods("GET")
 
 	s.router.HandleFunc("/tags", s.tags.Create).Methods("POST")
+	s.router.HandleFunc("/tags/{id}", s.tags.Update).Methods("PATCH")
+	s.router.HandleFunc("/tags/{id}", s.tags.Delete).Methods("DELETE")
 }

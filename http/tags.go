@@ -50,3 +50,32 @@ func (h *TagHandler) Create(w http.ResponseWriter, r *http.Request) {
 	}
 	renderJSON(w, &tag, http.StatusOK)
 }
+
+func (h *TagHandler) Update(w http.ResponseWriter, r *http.Request) {
+	id := mux.Vars(r)["id"]
+	var tmp app.Tag
+	// Read the request body
+	if err := json.NewDecoder(r.Body).Decode(&tmp); err != nil {
+		renderJSON(w, "Failed. Please check json syntax", http.StatusBadRequest)
+		return
+	}
+	defer r.Body.Close()
+	// Create Tag
+	tag, err := h.tagStore.Update(id, tmp)
+	if err != nil {
+		renderJSON(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+	renderJSON(w, &tag, http.StatusOK)
+}
+
+func (h *TagHandler) Delete(w http.ResponseWriter, r *http.Request) {
+	id := mux.Vars(r)["id"]
+
+	err := h.tagStore.Delete(id)
+	if err != nil {
+		renderJSON(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+	renderJSON(w, "Tag "+id+" has been deleted successfully", http.StatusOK)
+}
