@@ -23,11 +23,17 @@ func (s *TagService) GetByID(id string) (*app.Tag, error) {
 }
 
 func (s *TagService) GetByName(name string) (*app.Tag, error) {
-	var tag app.Tag
+	var tag *app.Tag
 	if s.DB.First(&tag, "name = ?", name).RecordNotFound() {
 		return nil, errors.New("Record not found")
 	}
-	return &tag, nil
+	return tag, nil
+}
+
+func (s *TagService) GetList() ([]*app.Tag, error) {
+	var tags []*app.Tag
+	s.DB.Order("ID ASC").Find(&tags)
+	return tags, nil
 }
 
 func RunMigrations(db *gorm.DB) error {
