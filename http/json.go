@@ -6,7 +6,7 @@ import (
 	"net/http"
 )
 
-func ResponseWithJSON(w http.ResponseWriter, data interface{}, code int) {
+func renderJSON(w http.ResponseWriter, data interface{}, code int) {
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 	w.WriteHeader(code)
 
@@ -18,7 +18,7 @@ func ResponseWithJSON(w http.ResponseWriter, data interface{}, code int) {
 	default:
 		res, err := json.Marshal(data)
 		if err != nil {
-			ResponseWithJSON(w, "Can not marshal output", http.StatusInternalServerError)
+			renderJSON(w, "Can not marshal output", http.StatusInternalServerError)
 			return
 		}
 		w.Write(res)
