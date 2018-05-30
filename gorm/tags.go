@@ -36,6 +36,13 @@ func (s *TagService) GetList() ([]*app.Tag, error) {
 	return tags, nil
 }
 
+func (s *TagService) Create(tag app.Tag) (*app.Tag, error) {
+	if err := s.DB.Save(&tag).Error; err != nil {
+		return nil, err
+	}
+	return &tag, nil
+}
+
 func RunMigrations(db *gorm.DB) error {
 	m := gormigrate.New(db, gormigrate.DefaultOptions, []*gormigrate.Migration{
 		{

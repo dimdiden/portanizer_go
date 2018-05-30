@@ -31,4 +31,6 @@ func NewServer(ts app.TagStore) *Server {
 func (s *Server) routes() {
 	s.router.HandleFunc("/tags", s.tags.GetList).Methods("GET")
 	s.router.HandleFunc("/tags/{id}", s.tags.Get).Methods("GET")
+
+	s.router.HandleFunc("/tags", s.tags.Create).Methods("POST")
 }

@@ -1,6 +1,7 @@
 package http
 
 import (
+	"encoding/json"
 	"net/http"
 
 	app "github.com/dimdiden/portanizer_sop"
@@ -31,4 +32,21 @@ func (h *TagHandler) GetList(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	ResponseWithJSON(w, tags, http.StatusOK)
+}
+
+func (h *TagHandler) Create(w http.ResponseWriter, r *http.Request) {
+	var tmp app.Tag
+	// Read the request body
+	if err := json.NewDecoder(r.Body).Decode(&tmp); err != nil {
+		ResponseWithJSON(w, "Failed. Please check json syntax", http.StatusBadRequest)
+		return
+	}
+	defer r.Body.Close()
+	// Create Tag
+	tag, err := h.tagStore.Create(tmp)
+	if err != nil {
+		ResponseWithJSON(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+	ResponseWithJSON(w, &tag, http.StatusOK)
 }
