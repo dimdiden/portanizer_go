@@ -20,7 +20,8 @@ const (
 )
 
 var (
-	tagStore app.TagStore
+	tagStore  app.TagStore
+	postStore app.PostStore
 )
 
 func main() {
@@ -32,8 +33,11 @@ func main() {
 	defer db.Close()
 	gorm.RunMigrations(db)
 
-	tagStore = &gorm.TagService{DB: db}
+	db.LogMode(true)
 
-	server := http.NewServer(tagStore)
+	tagStore = &gorm.TagService{DB: db}
+	postStore = &gorm.PostService{DB: db}
+
+	server := http.NewServer(tagStore, postStore)
 	log.Fatal(http.ListenAndServe(":8080", server))
 }

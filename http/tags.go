@@ -12,8 +12,6 @@ type TagHandler struct {
 	tagStore app.TagStore
 }
 
-var ListenAndServe = http.ListenAndServe
-
 func (h *TagHandler) Get(w http.ResponseWriter, r *http.Request) {
 	id := mux.Vars(r)["id"]
 	tag, err := h.tagStore.GetByID(id)
@@ -25,7 +23,7 @@ func (h *TagHandler) Get(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *TagHandler) GetList(w http.ResponseWriter, r *http.Request) {
-	var tags []*app.Tag
+	// var tags []*app.Tag
 	tags, err := h.tagStore.GetList()
 	if err != nil {
 		renderJSON(w, err.Error(), http.StatusNotFound)

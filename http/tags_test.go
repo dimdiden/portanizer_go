@@ -13,6 +13,7 @@ import (
 func TestTagHandler(t *testing.T) {
 
 	var ts mock.TagService
+	// var ps mock.Pos
 
 	ts.GetIdFn = func(id string) (*app.Tag, error) {
 		if id != "100" {
@@ -29,7 +30,7 @@ func TestTagHandler(t *testing.T) {
 	if err != nil {
 		t.Fatal("could not create request: ", err)
 	}
-	// h.Get(w, r)
+
 	client := &http.Client{}
 	res, err := client.Do(r)
 	if err != nil {

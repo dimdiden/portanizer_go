@@ -9,8 +9,6 @@ type TagService struct {
 	DB *gorm.DB
 }
 
-var Open = gorm.Open
-
 func (s *TagService) GetByID(id string) (*app.Tag, error) {
 	var tag app.Tag
 	if s.DB.First(&tag, "id = ?", id).RecordNotFound() {

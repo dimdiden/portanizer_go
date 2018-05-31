@@ -8,20 +8,22 @@ import (
 )
 
 type Server struct {
-	tags   *TagHandler
+	post   *PostHandler
+	tag    *TagHandler
 	router *mux.Router
 }
+
+var ListenAndServe = http.ListenAndServe
 
 func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	s.router.ServeHTTP(w, r)
 }
 
 // NewServer will construct a Server and apply all of the necessary routes
-func NewServer(ts app.TagStore) *Server {
+func NewServer(ts app.TagStore, ps app.PostStore) *Server {
 	server := Server{
-		tags: &TagHandler{
-			tagStore: ts,
-		},
+		tag:    &TagHandler{tagStore: ts},
+		post:   &PostHandler{postStore: ps},
 		router: mux.NewRouter(),
 	}
 	server.routes()
@@ -29,10 +31,19 @@ func NewServer(ts app.TagStore) *Server {
 }
 
 func (s *Server) routes() {
-	s.router.HandleFunc("/tags", s.tags.GetList).Methods("GET")
-	s.router.HandleFunc("/tags/{id}", s.tags.Get).Methods("GET")
+	s.router.HandleFunc("/posts", s.post.GetList).Methods("GET")
+	s.router.HandleFunc("/posts", s.post.Create).Methods("POST")
 
-	s.router.HandleFunc("/tags", s.tags.Create).Methods("POST")
-	s.router.HandleFunc("/tags/{id}", s.tags.Update).Methods("PATCH")
-	s.router.HandleFunc("/tags/{id}", s.tags.Delete).Methods("DELETE")
+	s.router.HandleFunc("/posts/{id}", s.post.Get).Methods("GET")
+	s.router.HandleFunc("/posts/{id}", s.post.Update).Methods("PATCH")
+	s.router.HandleFunc("/posts/{id}", s.post.Delete).Methods("DELETE")
+
+	s.router.HandleFunc("/posts/{id}/tags", s.post.PutTags).Methods("PUT")
+
+	s.router.HandleFunc("/tags", s.tag.GetList).Methods("GET")
+	s.router.HandleFunc("/tags", s.tag.Create).Methods("POST")
+
+	s.router.HandleFunc("/tags/{id}", s.tag.Get).Methods("GET")
+	s.router.HandleFunc("/tags/{id}", s.tag.Update).Methods("PATCH")
+	s.router.HandleFunc("/tags/{id}", s.tag.Delete).Methods("DELETE")
 }
