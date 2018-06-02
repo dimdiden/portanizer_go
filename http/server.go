@@ -26,11 +26,21 @@ func NewServer(ts app.TagStore, ps app.PostStore) *Server {
 		post:   &PostHandler{postStore: ps},
 		router: mux.NewRouter(),
 	}
-	server.routes()
+	server.tagroutes()
+	server.postroutes()
 	return &server
 }
 
-func (s *Server) routes() {
+func (s *Server) tagroutes() {
+	s.router.HandleFunc("/tags", s.tag.GetList).Methods("GET")
+	s.router.HandleFunc("/tags", s.tag.Create).Methods("POST")
+
+	s.router.HandleFunc("/tags/{id}", s.tag.Get).Methods("GET")
+	s.router.HandleFunc("/tags/{id}", s.tag.Update).Methods("PATCH")
+	s.router.HandleFunc("/tags/{id}", s.tag.Delete).Methods("DELETE")
+}
+
+func (s *Server) postroutes() {
 	s.router.HandleFunc("/posts", s.post.GetList).Methods("GET")
 	s.router.HandleFunc("/posts", s.post.Create).Methods("POST")
 
@@ -39,11 +49,4 @@ func (s *Server) routes() {
 	s.router.HandleFunc("/posts/{id}", s.post.Delete).Methods("DELETE")
 
 	s.router.HandleFunc("/posts/{id}/tags", s.post.PutTags).Methods("PUT")
-
-	s.router.HandleFunc("/tags", s.tag.GetList).Methods("GET")
-	s.router.HandleFunc("/tags", s.tag.Create).Methods("POST")
-
-	s.router.HandleFunc("/tags/{id}", s.tag.Get).Methods("GET")
-	s.router.HandleFunc("/tags/{id}", s.tag.Update).Methods("PATCH")
-	s.router.HandleFunc("/tags/{id}", s.tag.Delete).Methods("DELETE")
 }
