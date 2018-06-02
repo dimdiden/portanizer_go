@@ -22,14 +22,14 @@ func (s *PostService) GetByID(id string) (*app.Post, error) {
 }
 
 func (s *PostService) GetByName(name string) (*app.Post, error) {
-	var post *app.Post
+	var post app.Post
 
 	if s.DB.First(&post, "name = ?", name).RecordNotFound() {
 		return nil, app.ErrNotFound
 	}
 	s.DB.Preload("Tags").Order("ID ASC").Find(&post)
 
-	return nil, app.ErrNotFound
+	return &post, nil
 }
 
 func (s *PostService) GetList() ([]*app.Post, error) {
