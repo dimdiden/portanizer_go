@@ -27,7 +27,9 @@ func (s *TagService) GetByName(name string) (*app.Tag, error) {
 
 func (s *TagService) GetList() ([]*app.Tag, error) {
 	var tags []*app.Tag
-	s.DB.Order("ID ASC").Find(&tags)
+	if err := s.DB.Order("ID ASC").Find(&tags).Error; err != nil {
+		return nil, err
+	}
 	return tags, nil
 }
 
@@ -39,13 +41,14 @@ func (s *TagService) Create(tag app.Tag) (*app.Tag, error) {
 }
 
 func (s *TagService) Update(id string, tag app.Tag) (*app.Tag, error) {
-	if s.DB.First(&tag, "id = ?", id).RecordNotFound() {
+	var updTag app.Tag
+	if s.DB.First(&updTag, "id = ?", id).RecordNotFound() {
 		return nil, app.ErrNotFound
 	}
-	if err := s.DB.Model(&tag).Updates(app.Tag{Name: tag.Name}).Error; err != nil {
+	if err := s.DB.Model(&updTag).Update(tag).Error; err != nil {
 		return nil, err
 	}
-	return &tag, nil
+	return &updTag, nil
 }
 
 func (s *TagService) Delete(id string) error {

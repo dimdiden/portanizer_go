@@ -23,10 +23,9 @@ func (h *TagHandler) Get(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *TagHandler) GetList(w http.ResponseWriter, r *http.Request) {
-	// var tags []*app.Tag
 	tags, err := h.tagStore.GetList()
 	if err != nil {
-		renderJSON(w, err.Error(), http.StatusNotFound)
+		renderJSON(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 	renderJSON(w, tags, http.StatusOK)
