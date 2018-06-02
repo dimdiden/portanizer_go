@@ -1,19 +1,27 @@
 package http
 
 import (
-	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 
 	app "github.com/dimdiden/portanizer_sop"
 	"github.com/dimdiden/portanizer_sop/mock"
+	"github.com/gorilla/mux"
 )
+
+func NewTagServer(ts app.TagStore) *Server {
+	server := Server{
+		tag:    &TagHandler{tagStore: ts},
+		router: mux.NewRouter(),
+	}
+	server.tagroutes()
+	return &server
+}
 
 func TestTagHandler(t *testing.T) {
 
-	var ts mock.TagService
-	// var ps mock.Pos
+	var ts mock.TagStore
 
 	ts.GetIdFn = func(id string) (*app.Tag, error) {
 		if id != "100" {
@@ -22,24 +30,13 @@ func TestTagHandler(t *testing.T) {
 		return &app.Tag{ID: 100, Name: "Tag100"}, nil
 	}
 
-	router := NewServer(&ts).router
-	srv := httptest.NewServer(router)
-	defer srv.Close()
+	router := NewTagServer(&ts).router
 
-	r, err := http.NewRequest("GET", srv.URL+"/tags/100", nil)
-	if err != nil {
-		t.Fatal("could not create request: ", err)
-	}
+	w := httptest.NewRecorder()
+	r, _ := http.NewRequest("GET", "/tags/100", nil)
 
-	client := &http.Client{}
-	res, err := client.Do(r)
-	if err != nil {
-		t.Fatal("could make request: ", err)
-	}
+	router.ServeHTTP(w, r)
 
-	fmt.Println(res.StatusCode)
-
-	// Validate mock.
 	if !ts.GetIdInvoked {
 		t.Fatal("expected Tag() to be invoked")
 	}
