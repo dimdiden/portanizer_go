@@ -60,6 +60,10 @@ func (h *TagHandler) Update(w http.ResponseWriter, r *http.Request) {
 	// Create Tag
 	tag, err := h.tagStore.Update(id, tmp)
 	if err != nil {
+		if err == app.ErrNotFound {
+			renderJSON(w, err.Error(), http.StatusNotFound)
+			return
+		}
 		renderJSON(w, err.Error(), http.StatusBadRequest)
 		return
 	}
@@ -71,6 +75,10 @@ func (h *TagHandler) Delete(w http.ResponseWriter, r *http.Request) {
 
 	err := h.tagStore.Delete(id)
 	if err != nil {
+		if err == app.ErrNotFound {
+			renderJSON(w, err.Error(), http.StatusNotFound)
+			return
+		}
 		renderJSON(w, err.Error(), http.StatusBadRequest)
 		return
 	}

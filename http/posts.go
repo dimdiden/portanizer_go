@@ -26,7 +26,7 @@ func (h *PostHandler) GetList(w http.ResponseWriter, r *http.Request) {
 	// var posts []*app.Post
 	posts, err := h.postStore.GetList()
 	if err != nil {
-		renderJSON(w, err.Error(), http.StatusNotFound)
+		renderJSON(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 	renderJSON(w, posts, http.StatusOK)
@@ -61,6 +61,10 @@ func (h *PostHandler) Update(w http.ResponseWriter, r *http.Request) {
 
 	post, err := h.postStore.Update(id, tmp)
 	if err != nil {
+		if err == app.ErrNotFound {
+			renderJSON(w, err.Error(), http.StatusNotFound)
+			return
+		}
 		renderJSON(w, err.Error(), http.StatusBadRequest)
 		return
 	}
@@ -77,6 +81,10 @@ func (h *PostHandler) PutTags(w http.ResponseWriter, r *http.Request) {
 	}
 	post, err := h.postStore.PutTags(id, tagids)
 	if err != nil {
+		if err == app.ErrNotFound {
+			renderJSON(w, err.Error(), http.StatusNotFound)
+			return
+		}
 		renderJSON(w, err.Error(), http.StatusBadRequest)
 		return
 	}
@@ -88,6 +96,10 @@ func (h *PostHandler) Delete(w http.ResponseWriter, r *http.Request) {
 
 	err := h.postStore.Delete(id)
 	if err != nil {
+		if err == app.ErrNotFound {
+			renderJSON(w, err.Error(), http.StatusNotFound)
+			return
+		}
 		renderJSON(w, err.Error(), http.StatusBadRequest)
 		return
 	}
