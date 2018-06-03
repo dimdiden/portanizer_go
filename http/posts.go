@@ -60,11 +60,10 @@ func (h *PostHandler) Update(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 
 	post, err := h.postStore.Update(id, tmp)
-	if err != nil {
-		if err == app.ErrNotFound {
-			renderJSON(w, err.Error(), http.StatusNotFound)
-			return
-		}
+	if err == app.ErrNotFound {
+		renderJSON(w, err.Error(), http.StatusNotFound)
+		return
+	} else if err != nil {
 		renderJSON(w, err.Error(), http.StatusBadRequest)
 		return
 	}
@@ -80,11 +79,10 @@ func (h *PostHandler) PutTags(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	post, err := h.postStore.PutTags(id, tagids)
-	if err != nil {
-		if err == app.ErrNotFound {
-			renderJSON(w, err.Error(), http.StatusNotFound)
-			return
-		}
+	if err == app.ErrNotFound {
+		renderJSON(w, err.Error(), http.StatusNotFound)
+		return
+	} else if err != nil {
 		renderJSON(w, err.Error(), http.StatusBadRequest)
 		return
 	}
@@ -94,12 +92,10 @@ func (h *PostHandler) PutTags(w http.ResponseWriter, r *http.Request) {
 func (h *PostHandler) Delete(w http.ResponseWriter, r *http.Request) {
 	id := mux.Vars(r)["id"]
 
-	err := h.postStore.Delete(id)
-	if err != nil {
-		if err == app.ErrNotFound {
-			renderJSON(w, err.Error(), http.StatusNotFound)
-			return
-		}
+	if err := h.postStore.Delete(id); err == app.ErrNotFound {
+		renderJSON(w, err.Error(), http.StatusNotFound)
+		return
+	} else if err != nil {
 		renderJSON(w, err.Error(), http.StatusBadRequest)
 		return
 	}
