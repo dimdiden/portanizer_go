@@ -24,8 +24,10 @@ func NewTagServer(ts app.TagStore) *Server {
 
 func TestTagHandler(t *testing.T) {
 	t.Run("GetTag", testGetTag)
+	t.Run("GetTagList", testGetTagList)
 	t.Run("CreateWithEmptyTagName", testCreateWithEmptyTagName)
 	t.Run("CreateWithUnknownTagField", testCreateWithUnknownTagField)
+	t.Run("CreateWithExistingTagField", testCreateWithExistingTagField)
 }
 
 func testGetTag(t *testing.T) {
@@ -46,7 +48,26 @@ func testGetTag(t *testing.T) {
 	equals(t, `{"ID":100,"Name":"Tag100"}`, w)
 
 	if !ts.GetIdInvoked {
-		t.Fatal("expected Tag() to be invoked")
+		t.Fatal("expected TagStore to be invoked")
+	}
+}
+
+func testGetTagList(t *testing.T) {
+
+	var ts mock.TagStore
+
+	ts.GetListFn = func() ([]*app.Tag, error) {
+		return []*app.Tag{&app.Tag{ID: 1, Name: "Tag1"}, &app.Tag{ID: 2, Name: "Tag2"}}, nil
+	}
+
+	handler := NewTagServer(&ts).router
+
+	w, err := sendRequest(handler, "GET", "/tags", nil)
+	ok(t, err)
+	equals(t, `[{"ID":1,"Name":"Tag1"},{"ID":2,"Name":"Tag2"}]`, w)
+
+	if !ts.GetListInvoked {
+		t.Fatal("expected TagStore to be invoked")
 	}
 }
 
@@ -68,8 +89,8 @@ func testCreateWithEmptyTagName(t *testing.T) {
 	ok(t, err)
 	equals(t, `{"Message": "Record has empty field"}`, w)
 
-	if !ts.CreateInvoked {
-		t.Fatal("expected Tag() to be invoked")
+	if ts.CreateInvoked {
+		t.Fatal("expected TagStore NOT to be invoked")
 	}
 }
 
@@ -92,7 +113,29 @@ func testCreateWithUnknownTagField(t *testing.T) {
 	equals(t, `{"Message": "json: unknown field \"Nam\""}`, w)
 
 	if ts.CreateInvoked {
-		t.Fatal("expected Tag() not to be invoked")
+		t.Fatal("expected TagStore NOT to be invoked")
+	}
+}
+
+func testCreateWithExistingTagField(t *testing.T) {
+	var ts mock.TagStore
+
+	ts.CreateFn = func(tag app.Tag) (*app.Tag, error) {
+		if tag.Name != "Tag1" {
+			t.Fatalf("unexpected tag Name: %v", tag.Name)
+		}
+		return nil, app.ErrExists
+	}
+
+	handler := NewTagServer(&ts).router
+	body := strings.NewReader(`{"Name": "Tag1"}`)
+
+	w, err := sendRequest(handler, "POST", "/tags", body)
+	ok(t, err)
+	equals(t, `{"Message": "Record already exists in the database"}`, w)
+
+	if !ts.CreateInvoked {
+		t.Fatal("expected TagStore to be invoked")
 	}
 }
 
