@@ -45,7 +45,7 @@ func (h *TagHandler) Create(w http.ResponseWriter, r *http.Request) {
 		renderJSON(w, strings.Replace(err.Error(), "\"", "\\\"", -1), http.StatusBadRequest)
 		return
 	}
-	if tmp.Name == "" {
+	if !tmp.IsValid() {
 		renderJSON(w, app.ErrEmpty.Error(), http.StatusBadRequest)
 		return
 	}
@@ -72,7 +72,7 @@ func (h *TagHandler) Update(w http.ResponseWriter, r *http.Request) {
 		renderJSON(w, strings.Replace(err.Error(), "\"", "\\\"", -1), http.StatusBadRequest)
 		return
 	}
-	if tmp.Name == "" {
+	if !tmp.IsValid() {
 		renderJSON(w, app.ErrEmpty.Error(), http.StatusBadRequest)
 		return
 	}
