@@ -25,6 +25,7 @@ func NewTagServer(ts app.TagStore) *Server {
 func TestTagHandler(t *testing.T) {
 	t.Run("GetTag", testGetTag)
 	t.Run("GetTagList", testGetTagList)
+	t.Run("CreateTag", testCreateTag)
 	t.Run("CreateWithEmptyTagName", testCreateWithEmptyTagName)
 	t.Run("CreateWithUnknownTagField", testCreateWithUnknownTagField)
 	t.Run("CreateWithExistingTagField", testCreateWithExistingTagField)
@@ -71,6 +72,29 @@ func testGetTagList(t *testing.T) {
 	}
 }
 
+func testCreateTag(t *testing.T) {
+
+	var ts mock.TagStore
+
+	ts.CreateFn = func(tag app.Tag) (*app.Tag, error) {
+		if tag.Name != "Tag1" {
+			t.Fatalf("unexpected tag Name: %v", tag.Name)
+		}
+		return &app.Tag{ID: 1, Name: "Tag1"}, nil
+	}
+
+	handler := NewTagServer(&ts).router
+	body := strings.NewReader(`{"Name": "Tag1"}`)
+
+	w, err := sendRequest(handler, "POST", "/tags", body)
+	ok(t, err)
+	equals(t, `{"ID":1,"Name":"Tag1"}`, w)
+
+	if !ts.CreateInvoked {
+		t.Fatal("expected TagStore to be invoked")
+	}
+}
+
 func testCreateWithEmptyTagName(t *testing.T) {
 
 	var ts mock.TagStore
@@ -98,12 +122,12 @@ func testCreateWithUnknownTagField(t *testing.T) {
 
 	var ts mock.TagStore
 
-	// ts.CreateFn = func(tag app.Tag) (*app.Tag, error) {
-	// 	if &tag.Name != nil {
-	// 		t.Fatalf("Tag Name field should be incorrect in this test case")
-	// 	}
-	// 	return nil, nil
-	// }
+	ts.CreateFn = func(tag app.Tag) (*app.Tag, error) {
+		if &tag.Name != nil {
+			t.Fatalf("Tag Name field should be incorrect in this test case")
+		}
+		return nil, nil
+	}
 
 	handler := NewTagServer(&ts).router
 	body := strings.NewReader(`{"Nam": "Tag1"}`)
