@@ -34,6 +34,9 @@ func (s *TagService) GetList() ([]*app.Tag, error) {
 }
 
 func (s *TagService) Create(tag app.Tag) (*app.Tag, error) {
+	if !s.DB.First(&tag, "name = ?", tag.Name).RecordNotFound() {
+		return nil, app.ErrExists
+	}
 	if err := s.DB.Save(&tag).Error; err != nil {
 		return nil, err
 	}
@@ -41,6 +44,9 @@ func (s *TagService) Create(tag app.Tag) (*app.Tag, error) {
 }
 
 func (s *TagService) Update(id string, tag app.Tag) (*app.Tag, error) {
+	if !s.DB.First(&tag, "name = ?", tag.Name).RecordNotFound() {
+		return nil, app.ErrExists
+	}
 	var updTag app.Tag
 	if s.DB.First(&updTag, "id = ?", id).RecordNotFound() {
 		return nil, app.ErrNotFound
