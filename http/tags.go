@@ -36,6 +36,7 @@ func (h *TagHandler) Create(w http.ResponseWriter, r *http.Request) {
 	var tmp app.Tag
 
 	decoder := json.NewDecoder(r.Body)
+	defer r.Body.Close()
 	decoder.DisallowUnknownFields()
 	// Read the request body
 	if err := decoder.Decode(&tmp); err != nil {
@@ -44,7 +45,10 @@ func (h *TagHandler) Create(w http.ResponseWriter, r *http.Request) {
 		renderJSON(w, strings.Replace(err.Error(), "\"", "\\\"", -1), http.StatusBadRequest)
 		return
 	}
-	defer r.Body.Close()
+	if tmp.Name == "" {
+		renderJSON(w, app.ErrEmpty.Error(), http.StatusBadRequest)
+		return
+	}
 	// Create Tag
 	tag, err := h.tagStore.Create(tmp)
 	if err != nil {
@@ -58,11 +62,20 @@ func (h *TagHandler) Update(w http.ResponseWriter, r *http.Request) {
 	id := mux.Vars(r)["id"]
 	var tmp app.Tag
 	// Read the request body
-	if err := json.NewDecoder(r.Body).Decode(&tmp); err != nil {
-		renderJSON(w, "Failed. Please check json syntax", http.StatusBadRequest)
+	decoder := json.NewDecoder(r.Body)
+	defer r.Body.Close()
+	decoder.DisallowUnknownFields()
+	// Read the request body
+	if err := decoder.Decode(&tmp); err != nil {
+		// strings.Replace is used to mitigate the issue with decoding of quotes in Tests
+		// should be changed to something more elegant
+		renderJSON(w, strings.Replace(err.Error(), "\"", "\\\"", -1), http.StatusBadRequest)
 		return
 	}
-	defer r.Body.Close()
+	if tmp.Name == "" {
+		renderJSON(w, app.ErrEmpty.Error(), http.StatusBadRequest)
+		return
+	}
 	// Create Tag
 	tag, err := h.tagStore.Update(id, tmp)
 	if err == app.ErrNotFound {
