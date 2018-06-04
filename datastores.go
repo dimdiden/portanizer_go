@@ -8,6 +8,10 @@ var (
 	// ErrNotFound is an implementation agnostic error that should be returned
 	// by any service implementation when a record was not located.
 	ErrNotFound = errors.New("Record not found")
+
+	ErrExists = errors.New("Record already exists in the database")
+
+	ErrEmpty = errors.New("Record has empty field")
 )
 
 type Assigner interface {
