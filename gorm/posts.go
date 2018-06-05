@@ -41,13 +41,13 @@ func (s *PostService) GetList() ([]*app.Post, error) {
 }
 
 func (s *PostService) Create(post app.Post) (*app.Post, error) {
-	newPost := app.Post{Name: post.Name, Body: post.Body, Tags: []app.Tag{}}
+	newPost := app.Post{Name: post.Name, Body: post.Body}
 	if err := s.DB.Create(&newPost).Error; err != nil {
 		return nil, err
 	}
 
 	for _, t := range post.Tags {
-		s.DB.FirstOrCreate(&t, app.Tag{Name: t.Name})
+		s.DB.FirstOrCreate(&t, t)
 		s.DB.Model(&newPost).Association("Tags").Append(t)
 	}
 	return &newPost, nil
@@ -59,7 +59,7 @@ func (s *PostService) Update(id string, post app.Post) (*app.Post, error) {
 		return nil, app.ErrNotFound
 	}
 
-	if err := s.DB.Model(&updPost).Update(post).Error; err != nil {
+	if err := s.DB.Model(&updPost).Update(app.Post{Name: post.Name, Body: post.Body}).Error; err != nil {
 		return nil, err
 	}
 	// Create tag if doesn't exist and assign tags to post
