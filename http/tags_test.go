@@ -22,13 +22,9 @@ func NewTagServer(ts app.TagStore) *Server {
 	return &server
 }
 
-func TestTagHandler(t *testing.T) {
+func TestGetTagHandlers(t *testing.T) {
 	t.Run("GetTag", testGetTag)
 	t.Run("GetTagList", testGetTagList)
-	t.Run("CreateTag", testCreateTag)
-	t.Run("CreateWithEmptyTagName", testCreateWithEmptyTagName)
-	t.Run("CreateWithUnknownTagField", testCreateWithUnknownTagField)
-	t.Run("CreateWithExistingTagField", testCreateWithExistingTagField)
 }
 
 func testGetTag(t *testing.T) {
@@ -70,6 +66,13 @@ func testGetTagList(t *testing.T) {
 	if !ts.GetListInvoked {
 		t.Fatal("expected TagStore to be invoked")
 	}
+}
+
+func TestCreateTagHandlers(t *testing.T) {
+	t.Run("CreateTag", testCreateTag)
+	t.Run("CreateWithEmptyTagName", testCreateWithEmptyTagName)
+	t.Run("CreateWithUnknownTagField", testCreateWithUnknownTagField)
+	t.Run("CreateWithExistingTagField", testCreateWithExistingTagField)
 }
 
 func testCreateTag(t *testing.T) {
@@ -159,6 +162,36 @@ func testCreateWithExistingTagField(t *testing.T) {
 	equals(t, `{"Message": "Record already exists in the database"}`, w)
 
 	if !ts.CreateInvoked {
+		t.Fatal("expected TagStore to be invoked")
+	}
+}
+
+func TestUpdateTagHandlers(t *testing.T) {
+	t.Run("UpdateTag", testUpdateTag)
+}
+
+func testUpdateTag(t *testing.T) {
+
+	var ts mock.TagStore
+
+	ts.UpdateFn = func(id string, tag app.Tag) (*app.Tag, error) {
+		if id != "1" {
+			t.Fatalf("unexpected id: %v", id)
+		}
+		if tag.Name != "Tag2" {
+			t.Fatalf("unexpected tag Name: %v", tag.Name)
+		}
+		return &app.Tag{ID: 1, Name: "Tag2"}, nil
+	}
+
+	handler := NewTagServer(&ts).router
+	body := strings.NewReader(`{"Name": "Tag2"}`)
+
+	w, err := sendRequest(handler, "PATCH", "/tags/1", body)
+	ok(t, err)
+	equals(t, `{"ID":1,"Name":"Tag2"}`, w)
+
+	if !ts.UpdateInvoked {
 		t.Fatal("expected TagStore to be invoked")
 	}
 }
