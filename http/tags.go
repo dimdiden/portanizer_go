@@ -3,7 +3,6 @@ package http
 import (
 	"encoding/json"
 	"net/http"
-	"strings"
 
 	app "github.com/dimdiden/portanizer_sop"
 	"github.com/gorilla/mux"
@@ -40,9 +39,7 @@ func (h *TagHandler) Create(w http.ResponseWriter, r *http.Request) {
 	decoder.DisallowUnknownFields()
 	// Read the request body
 	if err := decoder.Decode(&tmp); err != nil {
-		// strings.Replace is used to mitigate the issue with decoding of quotes in Tests
-		// should be changed to something more elegant
-		renderJSON(w, strings.Replace(err.Error(), "\"", "\\\"", -1), http.StatusBadRequest)
+		renderJSON(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 	if !tmp.IsValid() {
@@ -67,9 +64,7 @@ func (h *TagHandler) Update(w http.ResponseWriter, r *http.Request) {
 	decoder.DisallowUnknownFields()
 	// Read the request body
 	if err := decoder.Decode(&tmp); err != nil {
-		// strings.Replace is used to mitigate the issue with decoding of quotes in Tests
-		// should be changed to something more elegant
-		renderJSON(w, strings.Replace(err.Error(), "\"", "\\\"", -1), http.StatusBadRequest)
+		renderJSON(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 	if !tmp.IsValid() {

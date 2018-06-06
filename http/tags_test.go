@@ -114,7 +114,7 @@ func testCreateWithEmptyTagName(t *testing.T) {
 
 	w, err := sendRequest(handler, "POST", "/tags", body)
 	ok(t, err)
-	equals(t, `{"Message": "Record has empty field"}`, w)
+	equals(t, `{"Message":"Record has empty field"}`, w)
 
 	if ts.CreateInvoked {
 		t.Fatal("expected TagStore NOT to be invoked")
@@ -137,7 +137,7 @@ func testCreateWithUnknownTagField(t *testing.T) {
 
 	w, err := sendRequest(handler, "POST", "/tags", body)
 	ok(t, err)
-	equals(t, `{"Message": "json: unknown field \"Nam\""}`, w)
+	equals(t, `{"Message":"json: unknown field \"Nam\""}`, w)
 
 	if ts.CreateInvoked {
 		t.Fatal("expected TagStore NOT to be invoked")
@@ -159,7 +159,7 @@ func testCreateWithExistingTagField(t *testing.T) {
 
 	w, err := sendRequest(handler, "POST", "/tags", body)
 	ok(t, err)
-	equals(t, `{"Message": "Record already exists in the database"}`, w)
+	equals(t, `{"Message":"Record already exists in the database"}`, w)
 
 	if !ts.CreateInvoked {
 		t.Fatal("expected TagStore to be invoked")

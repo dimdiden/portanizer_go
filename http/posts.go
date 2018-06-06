@@ -23,7 +23,6 @@ func (h *PostHandler) Get(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *PostHandler) GetList(w http.ResponseWriter, r *http.Request) {
-	// var posts []*app.Post
 	posts, err := h.postStore.GetList()
 	if err != nil {
 		renderJSON(w, err.Error(), http.StatusInternalServerError)

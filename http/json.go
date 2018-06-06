@@ -2,9 +2,12 @@ package http
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 )
+
+type Info struct {
+	Message string
+}
 
 func renderJSON(w http.ResponseWriter, data interface{}, code int) {
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
@@ -12,8 +15,12 @@ func renderJSON(w http.ResponseWriter, data interface{}, code int) {
 
 	switch data := data.(type) {
 	case string:
-		str := fmt.Sprintf("{\"Message\": \"%s\"}", data)
-		res := []byte(str)
+		info := &Info{Message: data}
+		res, err := json.Marshal(info)
+		if err != nil {
+			renderJSON(w, "Can not marshal output", http.StatusInternalServerError)
+			return
+		}
 		w.Write(res)
 	default:
 		res, err := json.Marshal(data)
