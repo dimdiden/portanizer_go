@@ -168,6 +168,10 @@ func testCreateWithExistingTagField(t *testing.T) {
 
 func TestUpdateTagHandlers(t *testing.T) {
 	t.Run("UpdateTag", testUpdateTag)
+	t.Run("UpdateWithUnknownID", testUpdateWithUnknownID)
+	t.Run("UpdateWithEmptyTagName", testUpdateWithEmptyTagName)
+	t.Run("UpdateWithUnknownTagField", testUpdateWithUnknownTagField)
+	t.Run("UpdateWithExistingTagField", testUpdateWithExistingTagField)
 }
 
 func testUpdateTag(t *testing.T) {
@@ -192,6 +196,147 @@ func testUpdateTag(t *testing.T) {
 	equals(t, `{"ID":1,"Name":"Tag2"}`, w)
 
 	if !ts.UpdateInvoked {
+		t.Fatal("expected TagStore to be invoked")
+	}
+}
+
+func testUpdateWithUnknownID(t *testing.T) {
+
+	var ts mock.TagStore
+
+	ts.UpdateFn = func(id string, tag app.Tag) (*app.Tag, error) {
+		if id != "100" {
+			t.Fatalf("unexpected id: %v", id)
+		}
+		return nil, app.ErrNotFound
+	}
+
+	handler := NewTagServer(&ts).router
+	body := strings.NewReader(`{"Name": "Tag1"}`)
+
+	w, err := sendRequest(handler, "PATCH", "/tags/100", body)
+	ok(t, err)
+	equals(t, `{"Message":"Record not found"}`, w)
+
+	if !ts.UpdateInvoked {
+		t.Fatal("expected TagStore to be invoked")
+	}
+}
+
+func testUpdateWithEmptyTagName(t *testing.T) {
+
+	var ts mock.TagStore
+
+	ts.UpdateFn = func(id string, tag app.Tag) (*app.Tag, error) {
+		if id != "1" {
+			t.Fatalf("unexpected id: %v", id)
+		}
+		if tag.Name != "" {
+			t.Fatalf("unexpected tag Name: %v", tag.Name)
+		}
+		return nil, app.ErrEmpty
+	}
+
+	handler := NewTagServer(&ts).router
+	body := strings.NewReader(`{"Name": ""}`)
+
+	w, err := sendRequest(handler, "PATCH", "/tags/1", body)
+	ok(t, err)
+	equals(t, `{"Message":"Record has empty field"}`, w)
+
+	if ts.UpdateInvoked {
+		t.Fatal("expected TagStore NOT to be invoked")
+	}
+}
+
+func testUpdateWithUnknownTagField(t *testing.T) {
+
+	var ts mock.TagStore
+
+	ts.UpdateFn = func(id string, tag app.Tag) (*app.Tag, error) {
+		if &tag.Name != nil {
+			t.Fatalf("Tag Name field should be incorrect in this test case")
+		}
+		return nil, nil
+	}
+
+	handler := NewTagServer(&ts).router
+	body := strings.NewReader(`{"Nam": "Tag1"}`)
+
+	w, err := sendRequest(handler, "PATCH", "/tags/1", body)
+	ok(t, err)
+	equals(t, `{"Message":"json: unknown field \"Nam\""}`, w)
+
+	if ts.UpdateInvoked {
+		t.Fatal("expected TagStore NOT to be invoked")
+	}
+}
+
+func testUpdateWithExistingTagField(t *testing.T) {
+	var ts mock.TagStore
+
+	ts.UpdateFn = func(id string, tag app.Tag) (*app.Tag, error) {
+		if tag.Name != "Tag1" {
+			t.Fatalf("unexpected tag Name: %v", tag.Name)
+		}
+		return nil, app.ErrExists
+	}
+
+	handler := NewTagServer(&ts).router
+	body := strings.NewReader(`{"Name": "Tag1"}`)
+
+	w, err := sendRequest(handler, "PATCH", "/tags/1", body)
+	ok(t, err)
+	equals(t, `{"Message":"Record already exists in the database"}`, w)
+
+	if !ts.UpdateInvoked {
+		t.Fatal("expected TagStore to be invoked")
+	}
+}
+
+func TestDeleteTagHandlers(t *testing.T) {
+	t.Run("DeleteTag", testDeleteTag)
+	t.Run("DeleteWithUnknownID", testDeleteWithUnknownID)
+}
+
+func testDeleteTag(t *testing.T) {
+	var ts mock.TagStore
+
+	ts.DeleteFn = func(id string) error {
+		if id != "1" {
+			t.Fatalf("unexpected id: %v", id)
+		}
+		return nil
+	}
+
+	handler := NewTagServer(&ts).router
+
+	w, err := sendRequest(handler, "DELETE", "/tags/1", nil)
+	ok(t, err)
+	equals(t, `{"Message":"Tag 1 has been deleted successfully"}`, w)
+
+	if !ts.DeleteInvoked {
+		t.Fatal("expected TagStore to be invoked")
+	}
+}
+
+func testDeleteWithUnknownID(t *testing.T) {
+	var ts mock.TagStore
+
+	ts.DeleteFn = func(id string) error {
+		if id != "100" {
+			t.Fatalf("unexpected id: %v", id)
+		}
+		return app.ErrNotFound
+	}
+
+	handler := NewTagServer(&ts).router
+
+	w, err := sendRequest(handler, "DELETE", "/tags/100", nil)
+	ok(t, err)
+	equals(t, `{"Message":"Record not found"}`, w)
+
+	if !ts.DeleteInvoked {
 		t.Fatal("expected TagStore to be invoked")
 	}
 }
