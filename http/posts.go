@@ -34,11 +34,18 @@ func (h *PostHandler) GetList(w http.ResponseWriter, r *http.Request) {
 func (h *PostHandler) Create(w http.ResponseWriter, r *http.Request) {
 	var tmp app.Post
 	// Read the request body
-	if err := json.NewDecoder(r.Body).Decode(&tmp); err != nil {
-		renderJSON(w, "Failed. Please check json syntax", http.StatusBadRequest)
+	decoder := json.NewDecoder(r.Body)
+	defer r.Body.Close()
+	decoder.DisallowUnknownFields()
+	// Read the request body
+	if err := decoder.Decode(&tmp); err != nil {
+		renderJSON(w, err.Error(), http.StatusBadRequest)
 		return
 	}
-	defer r.Body.Close()
+	if !tmp.IsValid() {
+		renderJSON(w, app.ErrEmpty.Error(), http.StatusBadRequest)
+		return
+	}
 
 	post, err := h.postStore.Create(tmp)
 	if err != nil {
@@ -52,11 +59,18 @@ func (h *PostHandler) Update(w http.ResponseWriter, r *http.Request) {
 	id := mux.Vars(r)["id"]
 	var tmp app.Post
 	// Read the request body
-	if err := json.NewDecoder(r.Body).Decode(&tmp); err != nil {
-		renderJSON(w, "Failed. Please check json syntax", http.StatusBadRequest)
+	decoder := json.NewDecoder(r.Body)
+	defer r.Body.Close()
+	decoder.DisallowUnknownFields()
+	// Read the request body
+	if err := decoder.Decode(&tmp); err != nil {
+		renderJSON(w, err.Error(), http.StatusBadRequest)
 		return
 	}
-	defer r.Body.Close()
+	if !tmp.IsValid() {
+		renderJSON(w, app.ErrEmpty.Error(), http.StatusBadRequest)
+		return
+	}
 
 	post, err := h.postStore.Update(id, tmp)
 	if err == app.ErrNotFound {
@@ -73,7 +87,7 @@ func (h *PostHandler) PutTags(w http.ResponseWriter, r *http.Request) {
 	id := mux.Vars(r)["id"]
 
 	var tagids []string
-	if err := json.NewDecoder(r.Body).Decode(&tagids); err != nil {
+	if err := json.NewDecoder(r.Body).Decode(&tagids); err != nil { // <= need to add check for non-numeral values
 		renderJSON(w, "Failed. Please check json syntax", http.StatusBadRequest)
 		return
 	}
@@ -98,5 +112,5 @@ func (h *PostHandler) Delete(w http.ResponseWriter, r *http.Request) {
 		renderJSON(w, err.Error(), http.StatusBadRequest)
 		return
 	}
-	renderJSON(w, "Tag "+id+" has been deleted successfully", http.StatusOK)
+	renderJSON(w, "Post "+id+" has been deleted successfully", http.StatusOK)
 }

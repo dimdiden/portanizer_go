@@ -1,6 +1,8 @@
 package gorm
 
 import (
+	"fmt"
+
 	app "github.com/dimdiden/portanizer_sop"
 	"github.com/jinzhu/gorm"
 )
@@ -41,6 +43,10 @@ func (s *PostService) GetList() ([]*app.Post, error) {
 }
 
 func (s *PostService) Create(post app.Post) (*app.Post, error) {
+	if !s.DB.First(&post, "name = ?", post.Name).RecordNotFound() {
+		return nil, app.ErrExists
+	}
+
 	newPost := app.Post{Name: post.Name, Body: post.Body}
 	if err := s.DB.Create(&newPost).Error; err != nil {
 		return nil, err
@@ -54,6 +60,10 @@ func (s *PostService) Create(post app.Post) (*app.Post, error) {
 }
 
 func (s *PostService) Update(id string, post app.Post) (*app.Post, error) {
+	if !s.DB.First(&post, "name = ?", post.Name).RecordNotFound() && id != fmt.Sprint(post.ID) {
+		return nil, app.ErrExists
+	}
+
 	var updPost app.Post
 	if s.DB.First(&updPost, "id = ?", id).RecordNotFound() {
 		return nil, app.ErrNotFound
