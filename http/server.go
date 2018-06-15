@@ -2,8 +2,10 @@ package http
 
 import (
 	"net/http"
+	"os"
 
 	app "github.com/dimdiden/portanizer_sop"
+	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 )
 
@@ -11,12 +13,21 @@ type Server struct {
 	post   *PostHandler
 	tag    *TagHandler
 	router *mux.Router
+
+	logOn bool
 }
 
 var ListenAndServe = http.ListenAndServe
 
 func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	s.router.ServeHTTP(w, r)
+	var handler http.Handler
+	switch s.logOn {
+	case true:
+		handler = handlers.LoggingHandler(os.Stdout, s.router)
+	default:
+		handler = s.router
+	}
+	handler.ServeHTTP(w, r)
 }
 
 // NewServer will construct a Server and apply all of the necessary routes
@@ -28,7 +39,12 @@ func NewServer(ts app.TagStore, ps app.PostStore) *Server {
 	}
 	server.tagroutes()
 	server.postroutes()
+
 	return &server
+}
+
+func (s *Server) LogHttpEnable() {
+	s.logOn = true
 }
 
 func (s *Server) tagroutes() {

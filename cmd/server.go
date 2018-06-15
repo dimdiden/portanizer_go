@@ -39,5 +39,6 @@ func main() {
 	postStore = &gorm.PostService{DB: db}
 
 	server := http.NewServer(tagStore, postStore)
+	server.LogHttpEnable()
 	log.Fatal(http.ListenAndServe(":8080", server))
 }
