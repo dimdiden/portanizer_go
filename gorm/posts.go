@@ -18,7 +18,7 @@ func (s *PostService) GetByID(id string) (*app.Post, error) {
 		return nil, app.ErrNotFound
 	}
 
-	s.DB.Find(&post).Order("ID ASC").Preload("Tags")
+	s.DB.Preload("Tags").Order("ID ASC").Find(&post)
 
 	return &post, nil
 }
