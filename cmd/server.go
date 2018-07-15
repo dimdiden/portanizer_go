@@ -13,8 +13,8 @@ import (
 const (
 	driver = "mysql"
 	host   = "localhost"
-	// port   = "8080"
-	user = "root"
+	port   = "8080"
+	user   = "root"
 	// password = "your-password"
 	dbname = "portanizer_sop"
 )
@@ -40,5 +40,5 @@ func main() {
 
 	server := http.NewServer(tagStore, postStore)
 	server.LogHttpEnable()
-	log.Fatal(http.ListenAndServe(":8080", server))
+	log.Fatal(http.ListenAndServe(":"+port, server))
 }
