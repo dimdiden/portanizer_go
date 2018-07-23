@@ -12,9 +12,9 @@ import (
 
 const (
 	driver = "mysql"
-	host   = "localhost"
-	port   = "8080"
-	user   = "root"
+	// host   = "localhost"
+	port = "8080"
+	user = "root"
 	// password = "your-password"
 	dbname = "portanizer_sop"
 )
