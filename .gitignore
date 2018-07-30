@@ -1,3 +1,4 @@
 vendor/
 secrets.json
 portaserver
+db.sql
