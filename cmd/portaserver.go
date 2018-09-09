@@ -5,13 +5,13 @@ import (
 	"log"
 
 	app "github.com/dimdiden/portanizer_sop"
-	"github.com/dimdiden/portanizer_sop/configure"
+	conf "github.com/dimdiden/portanizer_sop/conf"
 	"github.com/dimdiden/portanizer_sop/gorm"
 	"github.com/dimdiden/portanizer_sop/http"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
 )
 
-const CONFFILE = "./secrets.json"
+// const CONFFILE = "./secrets.json"
 
 var (
 	tagStore  app.TagStore
@@ -19,16 +19,13 @@ var (
 )
 
 func main() {
-	// Create Conf object to use it in starting the server
-	c, err := configure.FromFile(CONFFILE)
-	if err != nil {
-		fmt.Println(err)
-		c = configure.Default()
-		fmt.Print("Running from the default configuration:\n", c)
-	}
-	// Open the database
-	cs := fmt.Sprintf("%s:%s@tcp(%s:3306)/%s?charset=utf8&parseTime=True&loc=Local", c.User, c.Pswd, c.Host, c.DbName)
-	db, err := gorm.Open(c.Driver, cs)
+	// Load the configuration either from environment or from the default values
+	c := conf.Get()
+	fmt.Print("Running configuration:\n", c)
+
+	// Open the GORM istance of the database
+	cs := fmt.Sprintf("%s:%s@tcp(%s:3306)/%s?charset=utf8&parseTime=True&loc=Local", c.DBuser, c.DBpswd, c.DBhost, c.DBname)
+	db, err := gorm.Open(c.DBdriver, cs)
 	if err != nil {
 		log.Fatal("Error opening database:", err)
 	}
@@ -44,5 +41,5 @@ func main() {
 	server := http.NewServer(tagStore, postStore)
 	// Enable the http logs and run
 	server.LogHttpEnable()
-	log.Fatal(http.ListenAndServe(":"+c.Port, server))
+	log.Fatal(http.ListenAndServe(":"+c.APPport, server))
 }
