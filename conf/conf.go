@@ -12,7 +12,7 @@ const (
 	DB_DRIVER = "mysql"
 	DB_NAME   = "portanizer"
 	DB_USER   = "root"
-	DB_PSWD   = "Ltleirf180586"
+	DB_PSWD   = ""
 )
 
 var CONFLIST = map[string]string{
