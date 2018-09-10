@@ -66,7 +66,6 @@ func Get() *Conf {
 
 func getOpt(opt string) string {
 	val, ok := os.LookupEnv(opt)
-	fmt.Println(opt, ok)
 	if !ok {
 		return CONFLIST[opt]
 	}
