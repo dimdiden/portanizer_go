@@ -10,18 +10,18 @@ const (
 
 	DB_HOST   = "127.0.0.1"
 	DB_DRIVER = "mysql"
-	DB_NAME   = "portanizer_sop"
+	DB_NAME   = "portanizer"
 	DB_USER   = "root"
-	DB_PSWD   = ""
+	DB_PSWD   = "Ltleirf180586"
 )
 
 var CONFLIST = map[string]string{
-	"APPport":  "8080",
-	"DBhost":   "127.0.0.1",
-	"DBdriver": "mysql",
-	"DBname":   "portanizer_sop",
-	"DBuser":   "root",
-	"DBpswd":   "",
+	"APPport":  APP_PORT,
+	"DBhost":   DB_HOST,
+	"DBdriver": DB_DRIVER,
+	"DBname":   DB_NAME,
+	"DBuser":   DB_USER,
+	"DBpswd":   DB_PSWD,
 }
 
 type Conf struct {
