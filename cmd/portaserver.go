@@ -5,7 +5,7 @@ import (
 	"log"
 
 	app "github.com/dimdiden/portanizer_sop"
-	conf "github.com/dimdiden/portanizer_sop/conf"
+	"github.com/dimdiden/portanizer_sop/conf"
 	"github.com/dimdiden/portanizer_sop/gorm"
 	"github.com/dimdiden/portanizer_sop/http"
 	_ "github.com/jinzhu/gorm/dialects/mysql"

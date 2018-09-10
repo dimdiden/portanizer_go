@@ -16,19 +16,19 @@ const (
 )
 
 var CONFLIST = map[string]string{
-	"APPport":  APP_PORT,
-	"DBhost":   DB_HOST,
-	"DBdriver": DB_DRIVER,
-	"DBname":   DB_NAME,
-	"DBuser":   DB_USER,
-	"DBpswd":   DB_PSWD,
+	"APP_PORT":  APP_PORT,
+	"DB_HOST":   DB_HOST,
+	"DB_DRIVER": DB_DRIVER,
+	"DB_NAME":   DB_NAME,
+	"DB_USER":   DB_USER,
+	"DB_PSWD":   DB_PSWD,
 }
 
 type Conf struct {
 	// Host and port to run the server with
 	APPport string
-	DBhost  string
 	// The information for DB connection
+	DBhost   string
 	DBdriver string
 	DBname   string
 	DBuser   string
@@ -36,36 +36,37 @@ type Conf struct {
 }
 
 func (c Conf) String() string {
-	s := fmt.Sprintf("APP_PORT: %v\nDBhost: %v\nDBdriver: %v\nDBname: %v\nDBuser: %v\nDBpswd: %v\n",
+	s := fmt.Sprintf("APP_PORT: %v\nDB_HOST: %v\nDB_DRIVER: %v\nDB_NAME: %v\nDB_USER: %v\nDB_PSWD: %v\n",
 		c.APPport, c.DBhost, c.DBdriver, c.DBname, c.DBuser, c.DBpswd)
 	return s
 }
 
 func Default() *Conf {
 	return &Conf{
-		APPport:  CONFLIST["APPport"],
-		DBhost:   CONFLIST["DBhost"],
-		DBdriver: CONFLIST["DBdriver"],
-		DBname:   CONFLIST["DBname"],
-		DBuser:   CONFLIST["DBuser"],
-		DBpswd:   CONFLIST["DBpswd"],
+		APPport:  CONFLIST["APP_PORT"],
+		DBhost:   CONFLIST["DB_HOST"],
+		DBdriver: CONFLIST["DB_DRIVER"],
+		DBname:   CONFLIST["DB_NAME"],
+		DBuser:   CONFLIST["DB_USER"],
+		DBpswd:   CONFLIST["DB_PSWD"],
 	}
 }
 
 func Get() *Conf {
 	conf := &Conf{
-		APPport:  getOpt("APPport"),
-		DBhost:   getOpt("DBhost"),
-		DBdriver: getOpt("DBdriver"),
-		DBname:   getOpt("DBname"),
-		DBuser:   getOpt("DBuser"),
-		DBpswd:   getOpt("DBpswd"),
+		APPport:  getOpt("APP_PORT"),
+		DBhost:   getOpt("DB_HOST"),
+		DBdriver: getOpt("DB_DRIVER"),
+		DBname:   getOpt("DB_NAME"),
+		DBuser:   getOpt("DB_USER"),
+		DBpswd:   getOpt("DB_PSWD"),
 	}
 	return conf
 }
 
 func getOpt(opt string) string {
 	val, ok := os.LookupEnv(opt)
+	fmt.Println(opt, ok)
 	if !ok {
 		return CONFLIST[opt]
 	}
