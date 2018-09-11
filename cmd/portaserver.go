@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"log"
+	"time"
 
 	app "github.com/dimdiden/portanizer_sop"
 	"github.com/dimdiden/portanizer_sop/conf"
@@ -24,24 +25,21 @@ func main() {
 	fmt.Print("Running configuration:\n", c)
 
 	// Open the GORM istance of the database
-	cs := fmt.Sprintf("%s:%s@tcp(%s:3306)/%s?charset=utf8&parseTime=True&loc=Local", c.DBuser, c.DBpswd, c.DBhost, c.DBname)
+	// cs := fmt.Sprintf("%s:%s@tcp(%s:3306)/%s?charset=utf8&parseTime=True&loc=Local", c.DBuser, c.DBpswd, c.DBhost, c.DBname)
 
-	var db *gorm.DB
-
-	for {
-		var err error
-		db, err = gorm.Open(c.DBdriver, cs)
-		if err == nil {
-			break
-		}
-		log.Println("Error opening database:", err)
-		continue
-	}
-
-	// db, err := gorm.Open(c.DBdriver, cs)
-	// if err != nil {
-	// 	log.Fatal("Error opening database:", err)
+	// var db *gorm.DB
+	//
+	// for {
+	// 	var err error
+	// 	db, err = gorm.Open(c.DBdriver, cs)
+	// 	if err == nil {
+	// 		break
+	// 	}
+	// 	log.Println("Error opening database:", err)
+	// 	continue
 	// }
+	db := openDB(c)
+
 	defer db.Close()
 	// Migrate any changed in structs to DB schema
 	gorm.RunMigrations(db)
@@ -55,4 +53,22 @@ func main() {
 	// Enable the http logs and run
 	server.LogHttpEnable()
 	log.Fatal(http.ListenAndServe(":"+c.APPport, server))
+}
+
+func openDB(c *conf.Conf) *gorm.DB {
+	var db *gorm.DB
+
+	cs := fmt.Sprintf("%s:%s@tcp(%s:3306)/%s?charset=utf8&parseTime=True&loc=Local", c.DBuser, c.DBpswd, c.DBhost, c.DBname)
+	for {
+		var err error
+		db, err = gorm.Open(c.DBdriver, cs)
+		if err == nil {
+			break
+		}
+		log.Println("Error opening database:", err)
+		time.Sleep(1 * time.Second)
+		continue
+	}
+
+	return db
 }
