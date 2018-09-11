@@ -2,3 +2,5 @@ vendor/
 secrets.json
 portaserver
 db.sql
+portaserver.env
+db.env
