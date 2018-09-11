@@ -34,7 +34,7 @@ func main() {
 		if err == nil {
 			break
 		}
-		log.Fatal("Error opening database:", err)
+		log.Println("Error opening database:", err)
 		continue
 	}
 
