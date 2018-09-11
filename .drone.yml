@@ -1,0 +1,29 @@
+workspace:
+  base: /go
+  path: src/github.com/dimdiden/portanizer_sop
+
+pipeline:
+  testing:
+    image: golang:1.10.3
+    commands:
+      - go test -v .
+      - go vet
+
+  # build_linux_amd64:
+  #   image: golang:1.10.3
+  #   group: build
+  #   commands:
+  #     - make build_linux_amd64
+
+  publish_linux_amd64:
+    image: plugins/docker
+    pull: true
+    secrets: [ docker_username, docker_password ]
+    group: release
+    repo: dimdiden/portanizer_sop
+    auto_tag: true
+    dockerfile: Dockerfile
+    debug: true
+    when:
+      event: [ push, tag ]
+      local: false
