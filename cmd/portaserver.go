@@ -25,10 +25,23 @@ func main() {
 
 	// Open the GORM istance of the database
 	cs := fmt.Sprintf("%s:%s@tcp(%s:3306)/%s?charset=utf8&parseTime=True&loc=Local", c.DBuser, c.DBpswd, c.DBhost, c.DBname)
-	db, err := gorm.Open(c.DBdriver, cs)
-	if err != nil {
+
+	var db *gorm.DB
+
+	for {
+		var err error
+		db, err = gorm.Open(c.DBdriver, cs)
+		if err == nil {
+			break
+		}
 		log.Fatal("Error opening database:", err)
+		continue
 	}
+
+	// db, err := gorm.Open(c.DBdriver, cs)
+	// if err != nil {
+	// 	log.Fatal("Error opening database:", err)
+	// }
 	defer db.Close()
 	// Migrate any changed in structs to DB schema
 	gorm.RunMigrations(db)

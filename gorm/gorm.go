@@ -8,6 +8,8 @@ import (
 
 var Open = gorm.Open
 
+type DB = gorm.DB
+
 func RunMigrations(db *gorm.DB) error {
 	m := gormigrate.New(db, gormigrate.DefaultOptions, []*gormigrate.Migration{
 		{
