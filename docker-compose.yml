@@ -1,5 +1,6 @@
 version: '3'
 services:
+
   portaserver:
     build: .
     env_file:
@@ -8,6 +9,9 @@ services:
       - "8080:8080"
     depends_on:
       - "db"
+    networks:
+      net:
+        ipv4_address: 10.5.0.2
   db:
     image: mysql:5.7
     ports:
@@ -16,3 +20,14 @@ services:
       - db.env
     volumes:
       - /usr/local/var/mysql:/var/lib/mysql
+    networks:
+      net:
+        ipv4_address: 10.5.0.3
+
+networks:
+  net:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 10.5.0.0/16
