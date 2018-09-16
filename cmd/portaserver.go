@@ -25,21 +25,7 @@ func main() {
 	fmt.Print("Running configuration:\n", c)
 
 	// Open the GORM istance of the database
-	// cs := fmt.Sprintf("%s:%s@tcp(%s:3306)/%s?charset=utf8&parseTime=True&loc=Local", c.DBuser, c.DBpswd, c.DBhost, c.DBname)
-
-	// var db *gorm.DB
-	//
-	// for {
-	// 	var err error
-	// 	db, err = gorm.Open(c.DBdriver, cs)
-	// 	if err == nil {
-	// 		break
-	// 	}
-	// 	log.Println("Error opening database:", err)
-	// 	continue
-	// }
 	db := openDB(c)
-
 	defer db.Close()
 	// Migrate any changed in structs to DB schema
 	gorm.RunMigrations(db)
