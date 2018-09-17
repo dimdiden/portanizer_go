@@ -11,23 +11,24 @@ services:
       - "db"
     networks:
       net:
-        ipv4_address: 10.5.0.2
+        aliases:
+          - portaserver.internal.portanizer.com
   db:
     image: mysql:5.7
     ports:
       - "3306:3306"
+    command: --init-file /var/lib/mysql/init.sql
     env_file:
       - db.env
     volumes:
-      - /usr/local/var/mysql:/var/lib/mysql
+      - ./mysql:/var/lib/mysql
     networks:
       net:
-        ipv4_address: 10.5.0.3
+        aliases:
+          - db.internal.portanizer.com
 
+# https://github.com/Microsoft/sql-server-samples/blob/master/samples/development-frameworks/SqlServerOnDocker/docker-compose.yml
+# check on aliases later
 networks:
   net:
     driver: bridge
-    ipam:
-      driver: default
-      config:
-        - subnet: 10.5.0.0/16
