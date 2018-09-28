@@ -24,6 +24,7 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	fmt.Println("database connection has been established")
 	defer db.Close()
 
 	// Migrate any changed in structs to DB schema

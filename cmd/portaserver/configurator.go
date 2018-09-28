@@ -55,7 +55,7 @@ func Default() *Conf {
 }
 
 func NewConf() *Conf {
-	conf := &Conf{
+	return &Conf{
 		APPport:  getOpt("APP_PORT"),
 		DBhost:   getOpt("DB_HOST"),
 		DBdriver: getOpt("DB_DRIVER"),
@@ -63,7 +63,14 @@ func NewConf() *Conf {
 		DBuser:   getOpt("DB_USER"),
 		DBpswd:   getOpt("DB_PSWD"),
 	}
-	return conf
+}
+
+func getOpt(opt string) string {
+	val, ok := os.LookupEnv(opt)
+	if !ok {
+		return CONFLIST[opt]
+	}
+	return val
 }
 
 func (c *Conf) OpenDB() (*gorm.DB, error) {
@@ -74,12 +81,4 @@ func (c *Conf) OpenDB() (*gorm.DB, error) {
 
 	}
 	return db, nil
-}
-
-func getOpt(opt string) string {
-	val, ok := os.LookupEnv(opt)
-	if !ok {
-		return CONFLIST[opt]
-	}
-	return val
 }
