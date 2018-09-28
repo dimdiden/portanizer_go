@@ -67,17 +67,12 @@ func NewConf() *Conf {
 }
 
 func (c *Conf) OpenDB() (*gorm.DB, error) {
-	var db *gorm.DB
-	var err error
-
 	cs := fmt.Sprintf("%s:%s@tcp(%s:3306)/%s?charset=utf8&parseTime=True&loc=Local", c.DBuser, c.DBpswd, c.DBhost, c.DBname)
-	for {
-		db, err = gorm.Open(c.DBdriver, cs)
-		if err != nil {
-			return nil, fmt.Errorf("unable to open app db: %v", err)
-		}
-	}
+	db, err := gorm.Open(c.DBdriver, cs)
+	if err != nil {
+		return nil, fmt.Errorf("unable to open app db: %v", err)
 
+	}
 	return db, nil
 }
 

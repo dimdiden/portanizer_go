@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"log"
-	"time"
 
 	app "github.com/dimdiden/portanizer_sop"
 	"github.com/dimdiden/portanizer_sop/gorm"
@@ -19,21 +18,14 @@ var (
 func main() {
 	// Load the configuration either from environment or from the default values
 	c := NewConf()
-	fmt.Print("Running configuration:\n", c)
+	fmt.Print("running configuration:\n", c)
 
-	// Open the GORM istance of the database
-	var db *gorm.DB
-	var err error
-	for {
-		db, err = c.OpenDB()
-		if err == nil {
-			break
-		}
-		log.Println("Error opening database:", err)
-		time.Sleep(1 * time.Second)
+	db, err := c.OpenDB()
+	if err != nil {
+		log.Fatal(err)
 	}
-
 	defer db.Close()
+
 	// Migrate any changed in structs to DB schema
 	gorm.RunMigrations(db)
 	// Log each sql query
