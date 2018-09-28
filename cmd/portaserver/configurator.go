@@ -1,8 +1,10 @@
-package conf
+package main
 
 import (
 	"fmt"
 	"os"
+
+	"github.com/dimdiden/portanizer_sop/gorm"
 )
 
 const (
@@ -52,7 +54,7 @@ func Default() *Conf {
 	}
 }
 
-func Get() *Conf {
+func NewConf() *Conf {
 	conf := &Conf{
 		APPport:  getOpt("APP_PORT"),
 		DBhost:   getOpt("DB_HOST"),
@@ -62,6 +64,21 @@ func Get() *Conf {
 		DBpswd:   getOpt("DB_PSWD"),
 	}
 	return conf
+}
+
+func (c *Conf) OpenDB() (*gorm.DB, error) {
+	var db *gorm.DB
+	var err error
+
+	cs := fmt.Sprintf("%s:%s@tcp(%s:3306)/%s?charset=utf8&parseTime=True&loc=Local", c.DBuser, c.DBpswd, c.DBhost, c.DBname)
+	for {
+		db, err = gorm.Open(c.DBdriver, cs)
+		if err != nil {
+			return nil, fmt.Errorf("unable to open app db: %v", err)
+		}
+	}
+
+	return db, nil
 }
 
 func getOpt(opt string) string {
