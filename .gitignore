@@ -1,4 +1,5 @@
 vendor/
+mysql/
 secrets.json
 portaserver
 db.sql
