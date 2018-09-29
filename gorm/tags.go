@@ -7,11 +7,15 @@ import (
 	"github.com/jinzhu/gorm"
 )
 
-type TagRepo struct {
+type tagRepo struct {
 	DB *gorm.DB
 }
 
-func (r *TagRepo) GetByID(id string) (*portanizer.Tag, error) {
+func NewTagRepo(db *gorm.DB) portanizer.TagRepo {
+	return &tagRepo{DB: db}
+}
+
+func (r *tagRepo) GetByID(id string) (*portanizer.Tag, error) {
 	var tag portanizer.Tag
 	if r.DB.First(&tag, "id = ?", id).RecordNotFound() {
 		return nil, portanizer.ErrNotFound
@@ -19,7 +23,7 @@ func (r *TagRepo) GetByID(id string) (*portanizer.Tag, error) {
 	return &tag, nil
 }
 
-func (r *TagRepo) GetByName(name string) (*portanizer.Tag, error) {
+func (r *tagRepo) GetByName(name string) (*portanizer.Tag, error) {
 	var tag portanizer.Tag
 	if r.DB.First(&tag, "name = ?", name).RecordNotFound() {
 		return nil, portanizer.ErrNotFound
@@ -27,7 +31,7 @@ func (r *TagRepo) GetByName(name string) (*portanizer.Tag, error) {
 	return &tag, nil
 }
 
-func (r *TagRepo) GetList() ([]*portanizer.Tag, error) {
+func (r *tagRepo) GetList() ([]*portanizer.Tag, error) {
 	var tags []*portanizer.Tag
 	if err := r.DB.Order("ID ASC").Find(&tags).Error; err != nil {
 		return nil, err
@@ -35,7 +39,7 @@ func (r *TagRepo) GetList() ([]*portanizer.Tag, error) {
 	return tags, nil
 }
 
-func (r *TagRepo) Create(tag portanizer.Tag) (*portanizer.Tag, error) {
+func (r *tagRepo) Create(tag portanizer.Tag) (*portanizer.Tag, error) {
 	if !r.DB.First(&tag, "name = ?", tag.Name).RecordNotFound() {
 		return nil, portanizer.ErrExists
 	}
@@ -45,7 +49,7 @@ func (r *TagRepo) Create(tag portanizer.Tag) (*portanizer.Tag, error) {
 	return &tag, nil
 }
 
-func (r *TagRepo) Update(id string, tag portanizer.Tag) (*portanizer.Tag, error) {
+func (r *tagRepo) Update(id string, tag portanizer.Tag) (*portanizer.Tag, error) {
 	if !r.DB.First(&tag, "name = ?", tag.Name).RecordNotFound() && id != fmt.Sprint(tag.ID) {
 		return nil, portanizer.ErrExists
 	}
@@ -59,7 +63,7 @@ func (r *TagRepo) Update(id string, tag portanizer.Tag) (*portanizer.Tag, error)
 	return &updTag, nil
 }
 
-func (r *TagRepo) Delete(id string) error {
+func (r *tagRepo) Delete(id string) error {
 	var tag portanizer.Tag
 	if r.DB.First(&tag, "id = ?", id).RecordNotFound() {
 		return portanizer.ErrNotFound

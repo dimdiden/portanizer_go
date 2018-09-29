@@ -7,11 +7,15 @@ import (
 	"github.com/jinzhu/gorm"
 )
 
-type PostRepo struct {
+type postRepo struct {
 	DB *gorm.DB
 }
 
-func (r *PostRepo) GetByID(id string) (*portanizer.Post, error) {
+func NewPostRepo(db *gorm.DB) portanizer.PostRepo {
+	return &postRepo{DB: db}
+}
+
+func (r *postRepo) GetByID(id string) (*portanizer.Post, error) {
 	var post portanizer.Post
 
 	if r.DB.First(&post, "id = ?", id).RecordNotFound() {
@@ -22,7 +26,7 @@ func (r *PostRepo) GetByID(id string) (*portanizer.Post, error) {
 	return &post, nil
 }
 
-func (r *PostRepo) GetByName(name string) (*portanizer.Post, error) {
+func (r *postRepo) GetByName(name string) (*portanizer.Post, error) {
 	var post portanizer.Post
 
 	if r.DB.First(&post, "name = ?", name).RecordNotFound() {
@@ -33,7 +37,7 @@ func (r *PostRepo) GetByName(name string) (*portanizer.Post, error) {
 	return &post, nil
 }
 
-func (r *PostRepo) GetList() ([]*portanizer.Post, error) {
+func (r *postRepo) GetList() ([]*portanizer.Post, error) {
 	var posts []*portanizer.Post
 	if err := r.DB.Preload("Tags").Order("ID ASC").Find(&posts).Error; err != nil {
 		return nil, err
@@ -41,7 +45,7 @@ func (r *PostRepo) GetList() ([]*portanizer.Post, error) {
 	return posts, nil
 }
 
-func (r *PostRepo) Create(post portanizer.Post) (*portanizer.Post, error) {
+func (r *postRepo) Create(post portanizer.Post) (*portanizer.Post, error) {
 	if !r.DB.First(&post, "name = ?", post.Name).RecordNotFound() {
 		return nil, portanizer.ErrExists
 	}
@@ -58,7 +62,7 @@ func (r *PostRepo) Create(post portanizer.Post) (*portanizer.Post, error) {
 	return &newPost, nil
 }
 
-func (r *PostRepo) Update(id string, post portanizer.Post) (*portanizer.Post, error) {
+func (r *postRepo) Update(id string, post portanizer.Post) (*portanizer.Post, error) {
 	if !r.DB.First(&post, "name = ?", post.Name).RecordNotFound() && id != fmt.Sprint(post.ID) {
 		return nil, portanizer.ErrExists
 	}
@@ -79,7 +83,7 @@ func (r *PostRepo) Update(id string, post portanizer.Post) (*portanizer.Post, er
 	return &updPost, nil
 }
 
-func (r *PostRepo) PutTags(pid string, tagids []string) (*portanizer.Post, error) {
+func (r *postRepo) PutTags(pid string, tagids []string) (*portanizer.Post, error) {
 	var post portanizer.Post
 	if r.DB.First(&post, "id = ?", pid).RecordNotFound() {
 		return nil, portanizer.ErrNotFound
@@ -95,7 +99,7 @@ func (r *PostRepo) PutTags(pid string, tagids []string) (*portanizer.Post, error
 	return &post, nil
 }
 
-func (r *PostRepo) Delete(id string) error {
+func (r *postRepo) Delete(id string) error {
 	var post portanizer.Post
 	if r.DB.First(&post, "id = ?", id).RecordNotFound() {
 		return portanizer.ErrNotFound

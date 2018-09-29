@@ -29,7 +29,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 // NewServer will construct a Server and apply all of the necessary routes
-func New(tr portanizer.TagRepo, pr portanizer.PostRepo) *Server {
+func New(pr portanizer.PostRepo, tr portanizer.TagRepo) *Server {
 	server := Server{
 		post:   &postHandler{postRepo: pr},
 		tag:    &tagHandler{tagRepo: tr},
