@@ -1,4 +1,4 @@
-package http
+package server
 
 import (
 	"net/http"
@@ -10,14 +10,12 @@ import (
 )
 
 type Server struct {
-	post   *PostHandler
-	tag    *TagHandler
+	post   *postHandler
+	tag    *tagHandler
 	router *mux.Router
 
 	logOn bool
 }
-
-var ListenAndServe = http.ListenAndServe
 
 func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	var handler http.Handler
@@ -31,10 +29,10 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 // NewServer will construct a Server and apply all of the necessary routes
-func NewServer(tr portanizer.TagRepo, pr portanizer.PostRepo) *Server {
+func New(tr portanizer.TagRepo, pr portanizer.PostRepo) *Server {
 	server := Server{
-		post:   &PostHandler{postRepo: pr},
-		tag:    &TagHandler{tagRepo: tr},
+		post:   &postHandler{postRepo: pr},
+		tag:    &tagHandler{tagRepo: tr},
 		router: mux.NewRouter(),
 	}
 	server.postroutes()
@@ -43,7 +41,7 @@ func NewServer(tr portanizer.TagRepo, pr portanizer.PostRepo) *Server {
 	return &server
 }
 
-func (s *Server) LogHttpEnable() {
+func (s *Server) LogEnable() {
 	s.logOn = true
 }
 

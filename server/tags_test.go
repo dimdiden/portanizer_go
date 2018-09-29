@@ -1,4 +1,4 @@
-package http
+package server
 
 import (
 	"io"
@@ -15,7 +15,7 @@ import (
 
 func NewTagServer(tr portanizer.TagRepo) *Server {
 	server := Server{
-		tag:    &TagHandler{tagRepo: tr},
+		tag:    &tagHandler{tagRepo: tr},
 		router: mux.NewRouter(),
 	}
 	server.tagroutes()

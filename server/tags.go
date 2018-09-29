@@ -1,4 +1,4 @@
-package http
+package server
 
 import (
 	"encoding/json"
@@ -8,11 +8,11 @@ import (
 	"github.com/gorilla/mux"
 )
 
-type TagHandler struct {
+type tagHandler struct {
 	tagRepo portanizer.TagRepo
 }
 
-func (h *TagHandler) Get(w http.ResponseWriter, r *http.Request) {
+func (h *tagHandler) Get(w http.ResponseWriter, r *http.Request) {
 	id := mux.Vars(r)["id"]
 	tag, err := h.tagRepo.GetByID(id)
 	if err != nil {
@@ -22,7 +22,7 @@ func (h *TagHandler) Get(w http.ResponseWriter, r *http.Request) {
 	renderJSON(w, &tag, http.StatusOK)
 }
 
-func (h *TagHandler) GetList(w http.ResponseWriter, r *http.Request) {
+func (h *tagHandler) GetList(w http.ResponseWriter, r *http.Request) {
 	tags, err := h.tagRepo.GetList()
 	if err != nil {
 		renderJSON(w, err.Error(), http.StatusInternalServerError)
@@ -31,7 +31,7 @@ func (h *TagHandler) GetList(w http.ResponseWriter, r *http.Request) {
 	renderJSON(w, tags, http.StatusOK)
 }
 
-func (h *TagHandler) Create(w http.ResponseWriter, r *http.Request) {
+func (h *tagHandler) Create(w http.ResponseWriter, r *http.Request) {
 	var tmp portanizer.Tag
 
 	decoder := json.NewDecoder(r.Body)
@@ -55,7 +55,7 @@ func (h *TagHandler) Create(w http.ResponseWriter, r *http.Request) {
 	renderJSON(w, &tag, http.StatusOK)
 }
 
-func (h *TagHandler) Update(w http.ResponseWriter, r *http.Request) {
+func (h *tagHandler) Update(w http.ResponseWriter, r *http.Request) {
 	id := mux.Vars(r)["id"]
 	var tmp portanizer.Tag
 	// Read the request body
@@ -83,7 +83,7 @@ func (h *TagHandler) Update(w http.ResponseWriter, r *http.Request) {
 	renderJSON(w, &tag, http.StatusOK)
 }
 
-func (h *TagHandler) Delete(w http.ResponseWriter, r *http.Request) {
+func (h *tagHandler) Delete(w http.ResponseWriter, r *http.Request) {
 	id := mux.Vars(r)["id"]
 
 	if err := h.tagRepo.Delete(id); err == portanizer.ErrNotFound {

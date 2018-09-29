@@ -1,4 +1,4 @@
-package http
+package server
 
 import (
 	"encoding/json"
@@ -8,11 +8,11 @@ import (
 	"github.com/gorilla/mux"
 )
 
-type PostHandler struct {
+type postHandler struct {
 	postRepo portanizer.PostRepo
 }
 
-func (h *PostHandler) Get(w http.ResponseWriter, r *http.Request) {
+func (h *postHandler) Get(w http.ResponseWriter, r *http.Request) {
 	id := mux.Vars(r)["id"]
 	post, err := h.postRepo.GetByID(id)
 	if err != nil {
@@ -22,7 +22,7 @@ func (h *PostHandler) Get(w http.ResponseWriter, r *http.Request) {
 	renderJSON(w, &post, http.StatusOK)
 }
 
-func (h *PostHandler) GetList(w http.ResponseWriter, r *http.Request) {
+func (h *postHandler) GetList(w http.ResponseWriter, r *http.Request) {
 	posts, err := h.postRepo.GetList()
 	if err != nil {
 		renderJSON(w, err.Error(), http.StatusInternalServerError)
@@ -31,7 +31,7 @@ func (h *PostHandler) GetList(w http.ResponseWriter, r *http.Request) {
 	renderJSON(w, posts, http.StatusOK)
 }
 
-func (h *PostHandler) Create(w http.ResponseWriter, r *http.Request) {
+func (h *postHandler) Create(w http.ResponseWriter, r *http.Request) {
 	var tmp portanizer.Post
 	// Read the request body
 	decoder := json.NewDecoder(r.Body)
@@ -55,7 +55,7 @@ func (h *PostHandler) Create(w http.ResponseWriter, r *http.Request) {
 	renderJSON(w, &post, http.StatusOK)
 }
 
-func (h *PostHandler) Update(w http.ResponseWriter, r *http.Request) {
+func (h *postHandler) Update(w http.ResponseWriter, r *http.Request) {
 	id := mux.Vars(r)["id"]
 	var tmp portanizer.Post
 	// Read the request body
@@ -83,7 +83,7 @@ func (h *PostHandler) Update(w http.ResponseWriter, r *http.Request) {
 	renderJSON(w, &post, http.StatusOK)
 }
 
-func (h *PostHandler) PutTags(w http.ResponseWriter, r *http.Request) {
+func (h *postHandler) PutTags(w http.ResponseWriter, r *http.Request) {
 	id := mux.Vars(r)["id"]
 
 	var tagids []string
@@ -102,7 +102,7 @@ func (h *PostHandler) PutTags(w http.ResponseWriter, r *http.Request) {
 	renderJSON(w, &post, http.StatusOK)
 }
 
-func (h *PostHandler) Delete(w http.ResponseWriter, r *http.Request) {
+func (h *postHandler) Delete(w http.ResponseWriter, r *http.Request) {
 	id := mux.Vars(r)["id"]
 
 	if err := h.postRepo.Delete(id); err == portanizer.ErrNotFound {
