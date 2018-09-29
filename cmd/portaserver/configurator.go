@@ -83,10 +83,10 @@ func (c *Conf) OpenDB() (*gorm.DB, error) {
 	default:
 		return nil, errors.New("unsupported dialect for database")
 	}
+
 	db, err := gorm.Open(c.DBdriver, cparams)
 	if err != nil {
 		return nil, fmt.Errorf("unable to open app db: %v", err)
-
 	}
 	return db, nil
 }
