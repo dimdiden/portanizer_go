@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"os"
 
@@ -74,8 +75,15 @@ func getOpt(opt string) string {
 }
 
 func (c *Conf) OpenDB() (*gorm.DB, error) {
-	cs := fmt.Sprintf("%s:%s@tcp(%s:3306)/%s?charset=utf8&parseTime=True&loc=Local", c.DBuser, c.DBpswd, c.DBhost, c.DBname)
-	db, err := gorm.Open(c.DBdriver, cs)
+	var cparams string
+
+	switch c.DBdriver {
+	case "mysql":
+		cparams = fmt.Sprintf("%s:%s@tcp(%s:3306)/%s?charset=utf8&parseTime=True&loc=Local", c.DBuser, c.DBpswd, c.DBhost, c.DBname)
+	default:
+		return nil, errors.New("unsupported dialect for database")
+	}
+	db, err := gorm.Open(c.DBdriver, cparams)
 	if err != nil {
 		return nil, fmt.Errorf("unable to open app db: %v", err)
 
