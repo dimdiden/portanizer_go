@@ -2,30 +2,32 @@ version: '3'
 services:
 
   portaserver:
+    container_name: portaserver
     build: .
+    # image: dimdiden/portanizer_sop
     env_file:
       - portaserver.env
     ports:
       - "8080:8080"
     depends_on:
       - "db"
+    restart: always
     networks:
       net:
         aliases:
-          - portaserver.internal.portanizer.com
+          - portaserver.net
   db:
-    image: mysql:5.7
+    container_name: portadb
+    image: mysql
     ports:
       - "3306:3306"
-    command: --init-file /var/lib/mysql/init.sql
-    env_file:
-      - db.env
+    # command: --init-file /var/lib/mysql/init.sql
     volumes:
       - ./mysql:/var/lib/mysql
     networks:
       net:
         aliases:
-          - db.internal.portanizer.com
+          - portadb.net
 
 # https://github.com/Microsoft/sql-server-samples/blob/master/samples/development-frameworks/SqlServerOnDocker/docker-compose.yml
 # check on aliases later
