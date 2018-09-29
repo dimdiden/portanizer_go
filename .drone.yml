@@ -1,6 +1,6 @@
 workspace:
   base: /go
-  path: src/github.com/dimdiden/portanizer_sop
+  path: src/github.com/dimdiden/portanizer_go
 
 pipeline:
   testing:
@@ -8,7 +8,7 @@ pipeline:
     commands:
       - go get -u github.com/golang/dep/cmd/dep
       - dep ensure
-      - go test -v github.com/dimdiden/portanizer_sop/http
+      - go test -v github.com/dimdiden/portanizer_go/server
       - go vet
 
   # build_linux_amd64:
@@ -22,7 +22,7 @@ pipeline:
     pull: true
     secrets: [ docker_username, docker_password ]
     group: release
-    repo: dimdiden/portanizer_sop
+    repo: dimdiden/portanizer_go
     auto_tag: true
     dockerfile: Dockerfile
     debug: true
