@@ -4,5 +4,5 @@ secrets.json
 db.sql
 portaserver.env
 db.env
-portaserver
 init.sql
+app
