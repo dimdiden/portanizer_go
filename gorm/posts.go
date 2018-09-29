@@ -3,105 +3,105 @@ package gorm
 import (
 	"fmt"
 
-	app "github.com/dimdiden/portanizer_sop"
+	"github.com/dimdiden/portanizer"
 	"github.com/jinzhu/gorm"
 )
 
-type PostService struct {
+type PostRepo struct {
 	DB *gorm.DB
 }
 
-func (s *PostService) GetByID(id string) (*app.Post, error) {
-	var post app.Post
+func (r *PostRepo) GetByID(id string) (*portanizer.Post, error) {
+	var post portanizer.Post
 
-	if s.DB.First(&post, "id = ?", id).RecordNotFound() {
-		return nil, app.ErrNotFound
+	if r.DB.First(&post, "id = ?", id).RecordNotFound() {
+		return nil, portanizer.ErrNotFound
 	}
 
-	s.DB.Preload("Tags").Order("ID ASC").Find(&post)
+	r.DB.Preload("Tags").Order("ID ASC").Find(&post)
 
 	return &post, nil
 }
 
-func (s *PostService) GetByName(name string) (*app.Post, error) {
-	var post app.Post
+func (r *PostRepo) GetByName(name string) (*portanizer.Post, error) {
+	var post portanizer.Post
 
-	if s.DB.First(&post, "name = ?", name).RecordNotFound() {
-		return nil, app.ErrNotFound
+	if r.DB.First(&post, "name = ?", name).RecordNotFound() {
+		return nil, portanizer.ErrNotFound
 	}
-	s.DB.Preload("Tags").Order("ID ASC").Find(&post)
+	r.DB.Preload("Tags").Order("ID ASC").Find(&post)
 
 	return &post, nil
 }
 
-func (s *PostService) GetList() ([]*app.Post, error) {
-	var posts []*app.Post
-	if err := s.DB.Preload("Tags").Order("ID ASC").Find(&posts).Error; err != nil {
+func (r *PostRepo) GetList() ([]*portanizer.Post, error) {
+	var posts []*portanizer.Post
+	if err := r.DB.Preload("Tags").Order("ID ASC").Find(&posts).Error; err != nil {
 		return nil, err
 	}
 	return posts, nil
 }
 
-func (s *PostService) Create(post app.Post) (*app.Post, error) {
-	if !s.DB.First(&post, "name = ?", post.Name).RecordNotFound() {
-		return nil, app.ErrExists
+func (r *PostRepo) Create(post portanizer.Post) (*portanizer.Post, error) {
+	if !r.DB.First(&post, "name = ?", post.Name).RecordNotFound() {
+		return nil, portanizer.ErrExists
 	}
 
-	newPost := app.Post{Name: post.Name, Body: post.Body}
-	if err := s.DB.Create(&newPost).Error; err != nil {
+	newPost := portanizer.Post{Name: post.Name, Body: post.Body}
+	if err := r.DB.Create(&newPost).Error; err != nil {
 		return nil, err
 	}
 
 	for _, t := range post.Tags {
-		s.DB.FirstOrCreate(&t, t)
-		s.DB.Model(&newPost).Association("Tags").Append(t)
+		r.DB.FirstOrCreate(&t, t)
+		r.DB.Model(&newPost).Association("Tags").Append(t)
 	}
 	return &newPost, nil
 }
 
-func (s *PostService) Update(id string, post app.Post) (*app.Post, error) {
-	if !s.DB.First(&post, "name = ?", post.Name).RecordNotFound() && id != fmt.Sprint(post.ID) {
-		return nil, app.ErrExists
+func (r *PostRepo) Update(id string, post portanizer.Post) (*portanizer.Post, error) {
+	if !r.DB.First(&post, "name = ?", post.Name).RecordNotFound() && id != fmt.Sprint(post.ID) {
+		return nil, portanizer.ErrExists
 	}
 
-	var updPost app.Post
-	if s.DB.First(&updPost, "id = ?", id).RecordNotFound() {
-		return nil, app.ErrNotFound
+	var updPost portanizer.Post
+	if r.DB.First(&updPost, "id = ?", id).RecordNotFound() {
+		return nil, portanizer.ErrNotFound
 	}
 
-	if err := s.DB.Model(&updPost).Update(app.Post{Name: post.Name, Body: post.Body}).Error; err != nil {
+	if err := r.DB.Model(&updPost).Update(portanizer.Post{Name: post.Name, Body: post.Body}).Error; err != nil {
 		return nil, err
 	}
 	// Create tag if doesn't exist and assign tags to post
 	for _, t := range post.Tags {
-		s.DB.FirstOrCreate(&t, t)
-		s.DB.Model(&updPost).Association("Tags").Append(t)
+		r.DB.FirstOrCreate(&t, t)
+		r.DB.Model(&updPost).Association("Tags").Append(t)
 	}
 	return &updPost, nil
 }
 
-func (s *PostService) PutTags(pid string, tagids []string) (*app.Post, error) {
-	var post app.Post
-	if s.DB.First(&post, "id = ?", pid).RecordNotFound() {
-		return nil, app.ErrNotFound
+func (r *PostRepo) PutTags(pid string, tagids []string) (*portanizer.Post, error) {
+	var post portanizer.Post
+	if r.DB.First(&post, "id = ?", pid).RecordNotFound() {
+		return nil, portanizer.ErrNotFound
 	}
 
 	for _, id := range tagids {
-		var tag app.Tag
-		if s.DB.First(&tag, "id = ?", id).RecordNotFound() { // <= if not found then should be skipped
-			return nil, app.ErrNotFound
+		var tag portanizer.Tag
+		if r.DB.First(&tag, "id = ?", id).RecordNotFound() { // <= if not found then should be skipped
+			return nil, portanizer.ErrNotFound
 		}
-		s.DB.Model(&post).Association("Tags").Append(tag)
+		r.DB.Model(&post).Association("Tags").Append(tag)
 	}
 	return &post, nil
 }
 
-func (s *PostService) Delete(id string) error {
-	var post app.Post
-	if s.DB.First(&post, "id = ?", id).RecordNotFound() {
-		return app.ErrNotFound
+func (r *PostRepo) Delete(id string) error {
+	var post portanizer.Post
+	if r.DB.First(&post, "id = ?", id).RecordNotFound() {
+		return portanizer.ErrNotFound
 	}
-	if err := s.DB.Delete(&post).Error; err != nil {
+	if err := r.DB.Delete(&post).Error; err != nil {
 		return err
 	}
 	return nil

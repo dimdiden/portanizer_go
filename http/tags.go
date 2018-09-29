@@ -4,17 +4,17 @@ import (
 	"encoding/json"
 	"net/http"
 
-	app "github.com/dimdiden/portanizer_sop"
+	"github.com/dimdiden/portanizer"
 	"github.com/gorilla/mux"
 )
 
 type TagHandler struct {
-	tagStore app.TagStore
+	tagRepo portanizer.TagRepo
 }
 
 func (h *TagHandler) Get(w http.ResponseWriter, r *http.Request) {
 	id := mux.Vars(r)["id"]
-	tag, err := h.tagStore.GetByID(id)
+	tag, err := h.tagRepo.GetByID(id)
 	if err != nil {
 		renderJSON(w, err.Error(), http.StatusNotFound)
 		return
@@ -23,7 +23,7 @@ func (h *TagHandler) Get(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *TagHandler) GetList(w http.ResponseWriter, r *http.Request) {
-	tags, err := h.tagStore.GetList()
+	tags, err := h.tagRepo.GetList()
 	if err != nil {
 		renderJSON(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -32,7 +32,7 @@ func (h *TagHandler) GetList(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *TagHandler) Create(w http.ResponseWriter, r *http.Request) {
-	var tmp app.Tag
+	var tmp portanizer.Tag
 
 	decoder := json.NewDecoder(r.Body)
 	defer r.Body.Close()
@@ -43,11 +43,11 @@ func (h *TagHandler) Create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if !tmp.IsValid() {
-		renderJSON(w, app.ErrEmpty.Error(), http.StatusBadRequest)
+		renderJSON(w, portanizer.ErrEmpty.Error(), http.StatusBadRequest)
 		return
 	}
 	// Create Tag
-	tag, err := h.tagStore.Create(tmp)
+	tag, err := h.tagRepo.Create(tmp)
 	if err != nil {
 		renderJSON(w, err.Error(), http.StatusBadRequest)
 		return
@@ -57,7 +57,7 @@ func (h *TagHandler) Create(w http.ResponseWriter, r *http.Request) {
 
 func (h *TagHandler) Update(w http.ResponseWriter, r *http.Request) {
 	id := mux.Vars(r)["id"]
-	var tmp app.Tag
+	var tmp portanizer.Tag
 	// Read the request body
 	decoder := json.NewDecoder(r.Body)
 	defer r.Body.Close()
@@ -68,12 +68,12 @@ func (h *TagHandler) Update(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if !tmp.IsValid() {
-		renderJSON(w, app.ErrEmpty.Error(), http.StatusBadRequest)
+		renderJSON(w, portanizer.ErrEmpty.Error(), http.StatusBadRequest)
 		return
 	}
 	// Create Tag
-	tag, err := h.tagStore.Update(id, tmp)
-	if err == app.ErrNotFound {
+	tag, err := h.tagRepo.Update(id, tmp)
+	if err == portanizer.ErrNotFound {
 		renderJSON(w, err.Error(), http.StatusNotFound)
 		return
 	} else if err != nil {
@@ -86,7 +86,7 @@ func (h *TagHandler) Update(w http.ResponseWriter, r *http.Request) {
 func (h *TagHandler) Delete(w http.ResponseWriter, r *http.Request) {
 	id := mux.Vars(r)["id"]
 
-	if err := h.tagStore.Delete(id); err == app.ErrNotFound {
+	if err := h.tagRepo.Delete(id); err == portanizer.ErrNotFound {
 		renderJSON(w, err.Error(), http.StatusNotFound)
 		return
 	} else if err != nil {

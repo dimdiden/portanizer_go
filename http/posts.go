@@ -4,17 +4,17 @@ import (
 	"encoding/json"
 	"net/http"
 
-	app "github.com/dimdiden/portanizer_sop"
+	"github.com/dimdiden/portanizer"
 	"github.com/gorilla/mux"
 )
 
 type PostHandler struct {
-	postStore app.PostStore
+	postRepo portanizer.PostRepo
 }
 
 func (h *PostHandler) Get(w http.ResponseWriter, r *http.Request) {
 	id := mux.Vars(r)["id"]
-	post, err := h.postStore.GetByID(id)
+	post, err := h.postRepo.GetByID(id)
 	if err != nil {
 		renderJSON(w, err.Error(), http.StatusNotFound)
 		return
@@ -23,7 +23,7 @@ func (h *PostHandler) Get(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *PostHandler) GetList(w http.ResponseWriter, r *http.Request) {
-	posts, err := h.postStore.GetList()
+	posts, err := h.postRepo.GetList()
 	if err != nil {
 		renderJSON(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -32,7 +32,7 @@ func (h *PostHandler) GetList(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *PostHandler) Create(w http.ResponseWriter, r *http.Request) {
-	var tmp app.Post
+	var tmp portanizer.Post
 	// Read the request body
 	decoder := json.NewDecoder(r.Body)
 	defer r.Body.Close()
@@ -43,11 +43,11 @@ func (h *PostHandler) Create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if !tmp.IsValid() {
-		renderJSON(w, app.ErrEmpty.Error(), http.StatusBadRequest)
+		renderJSON(w, portanizer.ErrEmpty.Error(), http.StatusBadRequest)
 		return
 	}
 
-	post, err := h.postStore.Create(tmp)
+	post, err := h.postRepo.Create(tmp)
 	if err != nil {
 		renderJSON(w, err.Error(), http.StatusBadRequest)
 		return
@@ -57,7 +57,7 @@ func (h *PostHandler) Create(w http.ResponseWriter, r *http.Request) {
 
 func (h *PostHandler) Update(w http.ResponseWriter, r *http.Request) {
 	id := mux.Vars(r)["id"]
-	var tmp app.Post
+	var tmp portanizer.Post
 	// Read the request body
 	decoder := json.NewDecoder(r.Body)
 	defer r.Body.Close()
@@ -68,12 +68,12 @@ func (h *PostHandler) Update(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if !tmp.IsValid() {
-		renderJSON(w, app.ErrEmpty.Error(), http.StatusBadRequest)
+		renderJSON(w, portanizer.ErrEmpty.Error(), http.StatusBadRequest)
 		return
 	}
 
-	post, err := h.postStore.Update(id, tmp)
-	if err == app.ErrNotFound {
+	post, err := h.postRepo.Update(id, tmp)
+	if err == portanizer.ErrNotFound {
 		renderJSON(w, err.Error(), http.StatusNotFound)
 		return
 	} else if err != nil {
@@ -91,8 +91,8 @@ func (h *PostHandler) PutTags(w http.ResponseWriter, r *http.Request) {
 		renderJSON(w, "Failed. Please check json syntax", http.StatusBadRequest)
 		return
 	}
-	post, err := h.postStore.PutTags(id, tagids)
-	if err == app.ErrNotFound {
+	post, err := h.postRepo.PutTags(id, tagids)
+	if err == portanizer.ErrNotFound {
 		renderJSON(w, err.Error(), http.StatusNotFound)
 		return
 	} else if err != nil {
@@ -105,7 +105,7 @@ func (h *PostHandler) PutTags(w http.ResponseWriter, r *http.Request) {
 func (h *PostHandler) Delete(w http.ResponseWriter, r *http.Request) {
 	id := mux.Vars(r)["id"]
 
-	if err := h.postStore.Delete(id); err == app.ErrNotFound {
+	if err := h.postRepo.Delete(id); err == portanizer.ErrNotFound {
 		renderJSON(w, err.Error(), http.StatusNotFound)
 		return
 	} else if err != nil {

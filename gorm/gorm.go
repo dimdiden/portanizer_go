@@ -1,7 +1,7 @@
 package gorm
 
 import (
-	app "github.com/dimdiden/portanizer_sop"
+	app "github.com/dimdiden/portanizer"
 	"github.com/jinzhu/gorm"
 	gormigrate "gopkg.in/gormigrate.v1"
 )

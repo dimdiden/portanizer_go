@@ -1,50 +1,50 @@
 package mock
 
 import (
-	app "github.com/dimdiden/portanizer_sop"
+	"github.com/dimdiden/portanizer"
 )
 
 type TagStore struct {
-	GetIdFn      func(id string) (*app.Tag, error)
+	GetIdFn      func(id string) (*portanizer.Tag, error)
 	GetIdInvoked bool
 
-	GetNameFn      func(name string) (*app.Tag, error)
+	GetNameFn      func(name string) (*portanizer.Tag, error)
 	GetNameInvoked bool
 
-	GetListFn      func() ([]*app.Tag, error)
+	GetListFn      func() ([]*portanizer.Tag, error)
 	GetListInvoked bool
 
-	CreateFn      func(tag app.Tag) (*app.Tag, error)
+	CreateFn      func(tag portanizer.Tag) (*portanizer.Tag, error)
 	CreateInvoked bool
 
-	UpdateFn      func(id string, tag app.Tag) (*app.Tag, error)
+	UpdateFn      func(id string, tag portanizer.Tag) (*portanizer.Tag, error)
 	UpdateInvoked bool
 
 	DeleteFn      func(id string) error
 	DeleteInvoked bool
 }
 
-func (s *TagStore) GetByID(id string) (*app.Tag, error) {
+func (s *TagStore) GetByID(id string) (*portanizer.Tag, error) {
 	s.GetIdInvoked = true
 	return s.GetIdFn(id)
 }
 
-func (s *TagStore) GetByName(name string) (*app.Tag, error) {
+func (s *TagStore) GetByName(name string) (*portanizer.Tag, error) {
 	s.GetNameInvoked = true
 	return s.GetNameFn(name)
 }
 
-func (s *TagStore) GetList() ([]*app.Tag, error) {
+func (s *TagStore) GetList() ([]*portanizer.Tag, error) {
 	s.GetListInvoked = true
 	return s.GetListFn()
 }
 
-func (s *TagStore) Create(tag app.Tag) (*app.Tag, error) {
+func (s *TagStore) Create(tag portanizer.Tag) (*portanizer.Tag, error) {
 	s.CreateInvoked = true
 	return s.CreateFn(tag)
 }
 
-func (s *TagStore) Update(id string, tag app.Tag) (*app.Tag, error) {
+func (s *TagStore) Update(id string, tag portanizer.Tag) (*portanizer.Tag, error) {
 	s.UpdateInvoked = true
 	return s.UpdateFn(id, tag)
 }

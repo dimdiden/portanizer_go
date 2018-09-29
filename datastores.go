@@ -1,4 +1,4 @@
-package app
+package portanizer
 
 import (
 	"errors"
@@ -18,7 +18,7 @@ type Assigner interface {
 	PutTags(pid string, tagids []string) (*Post, error)
 }
 
-type PostStore interface {
+type PostRepo interface {
 	Assigner
 	GetByID(id string) (*Post, error)
 	GetByName(name string) (*Post, error)
@@ -28,7 +28,7 @@ type PostStore interface {
 	Delete(id string) error
 }
 
-type TagStore interface {
+type TagRepo interface {
 	GetByID(id string) (*Tag, error)
 	GetByName(name string) (*Tag, error)
 	GetList() ([]*Tag, error)

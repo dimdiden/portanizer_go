@@ -8,14 +8,14 @@ import (
 	"strings"
 	"testing"
 
-	app "github.com/dimdiden/portanizer_sop"
-	"github.com/dimdiden/portanizer_sop/mock"
+	"github.com/dimdiden/portanizer"
+	"github.com/dimdiden/portanizer/mock"
 	"github.com/gorilla/mux"
 )
 
-func NewTagServer(ts app.TagStore) *Server {
+func NewTagServer(tr portanizer.TagRepo) *Server {
 	server := Server{
-		tag:    &TagHandler{tagStore: ts},
+		tag:    &TagHandler{tagRepo: tr},
 		router: mux.NewRouter(),
 	}
 	server.tagroutes()
@@ -31,11 +31,11 @@ func testGetTag(t *testing.T) {
 
 	var ts mock.TagStore
 
-	ts.GetIdFn = func(id string) (*app.Tag, error) {
+	ts.GetIdFn = func(id string) (*portanizer.Tag, error) {
 		if id != "100" {
 			t.Fatalf("unexpected id: %v", id)
 		}
-		return &app.Tag{ID: 100, Name: "Tag100"}, nil
+		return &portanizer.Tag{ID: 100, Name: "Tag100"}, nil
 	}
 
 	handler := NewTagServer(&ts).router
@@ -53,8 +53,8 @@ func testGetTagList(t *testing.T) {
 
 	var ts mock.TagStore
 
-	ts.GetListFn = func() ([]*app.Tag, error) {
-		return []*app.Tag{&app.Tag{ID: 1, Name: "Tag1"}, &app.Tag{ID: 2, Name: "Tag2"}}, nil
+	ts.GetListFn = func() ([]*portanizer.Tag, error) {
+		return []*portanizer.Tag{&portanizer.Tag{ID: 1, Name: "Tag1"}, &portanizer.Tag{ID: 2, Name: "Tag2"}}, nil
 	}
 
 	handler := NewTagServer(&ts).router
@@ -79,11 +79,11 @@ func testCreateTag(t *testing.T) {
 
 	var ts mock.TagStore
 
-	ts.CreateFn = func(tag app.Tag) (*app.Tag, error) {
+	ts.CreateFn = func(tag portanizer.Tag) (*portanizer.Tag, error) {
 		if tag.Name != "Tag1" {
 			t.Fatalf("unexpected tag Name: %v", tag.Name)
 		}
-		return &app.Tag{ID: 1, Name: "Tag1"}, nil
+		return &portanizer.Tag{ID: 1, Name: "Tag1"}, nil
 	}
 
 	handler := NewTagServer(&ts).router
@@ -102,11 +102,11 @@ func testCreateWithEmptyTagName(t *testing.T) {
 
 	var ts mock.TagStore
 
-	ts.CreateFn = func(tag app.Tag) (*app.Tag, error) {
+	ts.CreateFn = func(tag portanizer.Tag) (*portanizer.Tag, error) {
 		if tag.Name != "" {
 			t.Fatalf("unexpected tag Name: %v", tag.Name)
 		}
-		return nil, app.ErrEmpty
+		return nil, portanizer.ErrEmpty
 	}
 
 	handler := NewTagServer(&ts).router
@@ -125,7 +125,7 @@ func testCreateWithUnknownTagField(t *testing.T) {
 
 	var ts mock.TagStore
 
-	ts.CreateFn = func(tag app.Tag) (*app.Tag, error) {
+	ts.CreateFn = func(tag portanizer.Tag) (*portanizer.Tag, error) {
 		if &tag.Name != nil {
 			t.Fatalf("Tag Name field should be incorrect in this test case")
 		}
@@ -147,11 +147,11 @@ func testCreateWithUnknownTagField(t *testing.T) {
 func testCreateWithExistingTagField(t *testing.T) {
 	var ts mock.TagStore
 
-	ts.CreateFn = func(tag app.Tag) (*app.Tag, error) {
+	ts.CreateFn = func(tag portanizer.Tag) (*portanizer.Tag, error) {
 		if tag.Name != "Tag1" {
 			t.Fatalf("unexpected tag Name: %v", tag.Name)
 		}
-		return nil, app.ErrExists
+		return nil, portanizer.ErrExists
 	}
 
 	handler := NewTagServer(&ts).router
@@ -178,14 +178,14 @@ func testUpdateTag(t *testing.T) {
 
 	var ts mock.TagStore
 
-	ts.UpdateFn = func(id string, tag app.Tag) (*app.Tag, error) {
+	ts.UpdateFn = func(id string, tag portanizer.Tag) (*portanizer.Tag, error) {
 		if id != "1" {
 			t.Fatalf("unexpected id: %v", id)
 		}
 		if tag.Name != "Tag2" {
 			t.Fatalf("unexpected tag Name: %v", tag.Name)
 		}
-		return &app.Tag{ID: 1, Name: "Tag2"}, nil
+		return &portanizer.Tag{ID: 1, Name: "Tag2"}, nil
 	}
 
 	handler := NewTagServer(&ts).router
@@ -204,11 +204,11 @@ func testUpdateWithUnknownID(t *testing.T) {
 
 	var ts mock.TagStore
 
-	ts.UpdateFn = func(id string, tag app.Tag) (*app.Tag, error) {
+	ts.UpdateFn = func(id string, tag portanizer.Tag) (*portanizer.Tag, error) {
 		if id != "100" {
 			t.Fatalf("unexpected id: %v", id)
 		}
-		return nil, app.ErrNotFound
+		return nil, portanizer.ErrNotFound
 	}
 
 	handler := NewTagServer(&ts).router
@@ -227,14 +227,14 @@ func testUpdateWithEmptyTagName(t *testing.T) {
 
 	var ts mock.TagStore
 
-	ts.UpdateFn = func(id string, tag app.Tag) (*app.Tag, error) {
+	ts.UpdateFn = func(id string, tag portanizer.Tag) (*portanizer.Tag, error) {
 		if id != "1" {
 			t.Fatalf("unexpected id: %v", id)
 		}
 		if tag.Name != "" {
 			t.Fatalf("unexpected tag Name: %v", tag.Name)
 		}
-		return nil, app.ErrEmpty
+		return nil, portanizer.ErrEmpty
 	}
 
 	handler := NewTagServer(&ts).router
@@ -253,7 +253,7 @@ func testUpdateWithUnknownTagField(t *testing.T) {
 
 	var ts mock.TagStore
 
-	ts.UpdateFn = func(id string, tag app.Tag) (*app.Tag, error) {
+	ts.UpdateFn = func(id string, tag portanizer.Tag) (*portanizer.Tag, error) {
 		if &tag.Name != nil {
 			t.Fatalf("Tag Name field should be incorrect in this test case")
 		}
@@ -275,11 +275,11 @@ func testUpdateWithUnknownTagField(t *testing.T) {
 func testUpdateWithExistingTagField(t *testing.T) {
 	var ts mock.TagStore
 
-	ts.UpdateFn = func(id string, tag app.Tag) (*app.Tag, error) {
+	ts.UpdateFn = func(id string, tag portanizer.Tag) (*portanizer.Tag, error) {
 		if tag.Name != "Tag1" {
 			t.Fatalf("unexpected tag Name: %v", tag.Name)
 		}
-		return nil, app.ErrExists
+		return nil, portanizer.ErrExists
 	}
 
 	handler := NewTagServer(&ts).router
@@ -327,7 +327,7 @@ func testDeleteWithUnknownID(t *testing.T) {
 		if id != "100" {
 			t.Fatalf("unexpected id: %v", id)
 		}
-		return app.ErrNotFound
+		return portanizer.ErrNotFound
 	}
 
 	handler := NewTagServer(&ts).router

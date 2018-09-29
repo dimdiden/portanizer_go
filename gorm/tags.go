@@ -3,68 +3,68 @@ package gorm
 import (
 	"fmt"
 
-	app "github.com/dimdiden/portanizer_sop"
+	"github.com/dimdiden/portanizer"
 	"github.com/jinzhu/gorm"
 )
 
-type TagService struct {
+type TagRepo struct {
 	DB *gorm.DB
 }
 
-func (s *TagService) GetByID(id string) (*app.Tag, error) {
-	var tag app.Tag
-	if s.DB.First(&tag, "id = ?", id).RecordNotFound() {
-		return nil, app.ErrNotFound
+func (r *TagRepo) GetByID(id string) (*portanizer.Tag, error) {
+	var tag portanizer.Tag
+	if r.DB.First(&tag, "id = ?", id).RecordNotFound() {
+		return nil, portanizer.ErrNotFound
 	}
 	return &tag, nil
 }
 
-func (s *TagService) GetByName(name string) (*app.Tag, error) {
-	var tag app.Tag
-	if s.DB.First(&tag, "name = ?", name).RecordNotFound() {
-		return nil, app.ErrNotFound
+func (r *TagRepo) GetByName(name string) (*portanizer.Tag, error) {
+	var tag portanizer.Tag
+	if r.DB.First(&tag, "name = ?", name).RecordNotFound() {
+		return nil, portanizer.ErrNotFound
 	}
 	return &tag, nil
 }
 
-func (s *TagService) GetList() ([]*app.Tag, error) {
-	var tags []*app.Tag
-	if err := s.DB.Order("ID ASC").Find(&tags).Error; err != nil {
+func (r *TagRepo) GetList() ([]*portanizer.Tag, error) {
+	var tags []*portanizer.Tag
+	if err := r.DB.Order("ID ASC").Find(&tags).Error; err != nil {
 		return nil, err
 	}
 	return tags, nil
 }
 
-func (s *TagService) Create(tag app.Tag) (*app.Tag, error) {
-	if !s.DB.First(&tag, "name = ?", tag.Name).RecordNotFound() {
-		return nil, app.ErrExists
+func (r *TagRepo) Create(tag portanizer.Tag) (*portanizer.Tag, error) {
+	if !r.DB.First(&tag, "name = ?", tag.Name).RecordNotFound() {
+		return nil, portanizer.ErrExists
 	}
-	if err := s.DB.Save(&tag).Error; err != nil {
+	if err := r.DB.Save(&tag).Error; err != nil {
 		return nil, err
 	}
 	return &tag, nil
 }
 
-func (s *TagService) Update(id string, tag app.Tag) (*app.Tag, error) {
-	if !s.DB.First(&tag, "name = ?", tag.Name).RecordNotFound() && id != fmt.Sprint(tag.ID) {
-		return nil, app.ErrExists
+func (r *TagRepo) Update(id string, tag portanizer.Tag) (*portanizer.Tag, error) {
+	if !r.DB.First(&tag, "name = ?", tag.Name).RecordNotFound() && id != fmt.Sprint(tag.ID) {
+		return nil, portanizer.ErrExists
 	}
-	var updTag app.Tag
-	if s.DB.First(&updTag, "id = ?", id).RecordNotFound() {
-		return nil, app.ErrNotFound
+	var updTag portanizer.Tag
+	if r.DB.First(&updTag, "id = ?", id).RecordNotFound() {
+		return nil, portanizer.ErrNotFound
 	}
-	if err := s.DB.Model(&updTag).Update(tag).Error; err != nil {
+	if err := r.DB.Model(&updTag).Update(tag).Error; err != nil {
 		return nil, err
 	}
 	return &updTag, nil
 }
 
-func (s *TagService) Delete(id string) error {
-	var tag app.Tag
-	if s.DB.First(&tag, "id = ?", id).RecordNotFound() {
-		return app.ErrNotFound
+func (r *TagRepo) Delete(id string) error {
+	var tag portanizer.Tag
+	if r.DB.First(&tag, "id = ?", id).RecordNotFound() {
+		return portanizer.ErrNotFound
 	}
-	if err := s.DB.Delete(&tag).Error; err != nil {
+	if err := r.DB.Delete(&tag).Error; err != nil {
 		return err
 	}
 	return nil

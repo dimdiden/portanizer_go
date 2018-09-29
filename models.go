@@ -1,4 +1,4 @@
-package app
+package portanizer
 
 type Post struct {
 	ID   uint

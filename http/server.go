@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"os"
 
-	app "github.com/dimdiden/portanizer_sop"
+	"github.com/dimdiden/portanizer"
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 )
@@ -31,10 +31,10 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 // NewServer will construct a Server and apply all of the necessary routes
-func NewServer(ts app.TagStore, ps app.PostStore) *Server {
+func NewServer(tr portanizer.TagRepo, pr portanizer.PostRepo) *Server {
 	server := Server{
-		tag:    &TagHandler{tagStore: ts},
-		post:   &PostHandler{postStore: ps},
+		tag:    &TagHandler{tagRepo: tr},
+		post:   &PostHandler{postRepo: pr},
 		router: mux.NewRouter(),
 	}
 	server.tagroutes()
