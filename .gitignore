@@ -5,4 +5,4 @@ db.sql
 portaserver.env
 db.env
 init.sql
-app
+portanizer

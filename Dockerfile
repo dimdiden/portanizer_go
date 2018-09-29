@@ -10,5 +10,5 @@ RUN go get -u github.com/golang/dep/cmd/dep
 RUN dep ensure
 
 # Build my app
-RUN go build -o portaserver cmd/portaserver/*
-CMD ["./portaserver"]
+RUN go build -o portanizer cmd/portanizer/*
+CMD ["./portanizer"]
