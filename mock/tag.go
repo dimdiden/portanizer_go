@@ -1,7 +1,7 @@
 package mock
 
 import (
-	"github.com/dimdiden/portanizer"
+	"github.com/dimdiden/portanizer_go"
 )
 
 type TagStore struct {

@@ -1,7 +1,7 @@
 package gorm
 
 import (
-	app "github.com/dimdiden/portanizer"
+	"github.com/dimdiden/portanizer_go"
 	"github.com/jinzhu/gorm"
 	gormigrate "gopkg.in/gormigrate.v1"
 )
@@ -15,19 +15,19 @@ func RunMigrations(db *gorm.DB) error {
 		{
 			ID: "initial",
 			Migrate: func(tx *gorm.DB) error {
-				return tx.AutoMigrate(&app.Tag{}).Error
+				return tx.AutoMigrate(&portanizer.Tag{}).Error
 			},
 			Rollback: func(tx *gorm.DB) error {
-				return tx.DropTable(&app.Tag{}).Error
+				return tx.DropTable(&portanizer.Tag{}).Error
 			},
 		},
 		{
 			ID: "add Post migration",
 			Migrate: func(tx *gorm.DB) error {
-				return tx.AutoMigrate(&app.Post{}).Error
+				return tx.AutoMigrate(&portanizer.Post{}).Error
 			},
 			Rollback: func(tx *gorm.DB) error {
-				return tx.DropTable(&app.Post{}).Error
+				return tx.DropTable(&portanizer.Post{}).Error
 			},
 		},
 	})

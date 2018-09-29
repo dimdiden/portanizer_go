@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/dimdiden/portanizer"
+	"github.com/dimdiden/portanizer_go"
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 )

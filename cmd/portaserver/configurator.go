@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/dimdiden/portanizer/gorm"
+	"github.com/dimdiden/portanizer_go/gorm"
 )
 
 const (

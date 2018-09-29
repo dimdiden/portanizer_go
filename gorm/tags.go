@@ -3,7 +3,7 @@ package gorm
 import (
 	"fmt"
 
-	"github.com/dimdiden/portanizer"
+	"github.com/dimdiden/portanizer_go"
 	"github.com/jinzhu/gorm"
 )
 

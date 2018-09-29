@@ -8,8 +8,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/dimdiden/portanizer"
-	"github.com/dimdiden/portanizer/mock"
+	"github.com/dimdiden/portanizer_go"
+	"github.com/dimdiden/portanizer_go/mock"
 	"github.com/gorilla/mux"
 )
 
