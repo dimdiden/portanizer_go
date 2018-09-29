@@ -17,7 +17,6 @@ func (r *PostRepo) GetByID(id string) (*portanizer.Post, error) {
 	if r.DB.First(&post, "id = ?", id).RecordNotFound() {
 		return nil, portanizer.ErrNotFound
 	}
-
 	r.DB.Preload("Tags").Order("ID ASC").Find(&post)
 
 	return &post, nil
