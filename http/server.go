@@ -33,27 +33,18 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 // NewServer will construct a Server and apply all of the necessary routes
 func NewServer(tr portanizer.TagRepo, pr portanizer.PostRepo) *Server {
 	server := Server{
-		tag:    &TagHandler{tagRepo: tr},
 		post:   &PostHandler{postRepo: pr},
+		tag:    &TagHandler{tagRepo: tr},
 		router: mux.NewRouter(),
 	}
-	server.tagroutes()
 	server.postroutes()
+	server.tagroutes()
 
 	return &server
 }
 
 func (s *Server) LogHttpEnable() {
 	s.logOn = true
-}
-
-func (s *Server) tagroutes() {
-	s.router.HandleFunc("/tags", s.tag.GetList).Methods("GET")
-	s.router.HandleFunc("/tags", s.tag.Create).Methods("POST")
-
-	s.router.HandleFunc("/tags/{id}", s.tag.Get).Methods("GET")
-	s.router.HandleFunc("/tags/{id}", s.tag.Update).Methods("PATCH")
-	s.router.HandleFunc("/tags/{id}", s.tag.Delete).Methods("DELETE")
 }
 
 func (s *Server) postroutes() {
@@ -65,4 +56,13 @@ func (s *Server) postroutes() {
 	s.router.HandleFunc("/posts/{id}", s.post.Delete).Methods("DELETE")
 
 	s.router.HandleFunc("/posts/{id}/tags", s.post.PutTags).Methods("PUT")
+}
+
+func (s *Server) tagroutes() {
+	s.router.HandleFunc("/tags", s.tag.GetList).Methods("GET")
+	s.router.HandleFunc("/tags", s.tag.Create).Methods("POST")
+
+	s.router.HandleFunc("/tags/{id}", s.tag.Get).Methods("GET")
+	s.router.HandleFunc("/tags/{id}", s.tag.Update).Methods("PATCH")
+	s.router.HandleFunc("/tags/{id}", s.tag.Delete).Methods("DELETE")
 }
