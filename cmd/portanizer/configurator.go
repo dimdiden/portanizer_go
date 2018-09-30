@@ -80,7 +80,7 @@ func (c *Conf) OpenDB() (*gorm.DB, error) {
 	switch c.DBdriver {
 	case "mysql":
 		cparams = fmt.Sprintf("%s:%s@tcp(%s:3306)/%s?charset=utf8&parseTime=True&loc=Local", c.DBuser, c.DBpswd, c.DBhost, c.DBname)
-	case "sqlite":
+	case "sqlite3":
 		cparams = "./sqlite.db"
 	default:
 		return nil, errors.New("unsupported dialect for database")
