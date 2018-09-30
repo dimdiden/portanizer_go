@@ -6,3 +6,5 @@ portaserver.env
 db.env
 init.sql
 app
+cmd/portanizer/portanizer
+sqlite.db
