@@ -34,11 +34,12 @@
   version = "v1.6.2"
 
 [[projects]]
-  digest = "1:b6f4477f09f11785097a121811f3a90d8d26cab73c1aa71abda859bdf6ad2334"
+  digest = "1:e1d9005e1e5251df2de49f9544d844f00c25b5887b6b5bab5a9999d0283e33c1"
   name = "github.com/jinzhu/gorm"
   packages = [
     ".",
     "dialects/mysql",
+    "dialects/sqlite",
   ]
   pruneopts = "UT"
   revision = "6ed508ec6a4ecb3531899a69cbc746ccf65a4166"
@@ -51,6 +52,14 @@
   packages = ["."]
   pruneopts = "UT"
   revision = "04140366298a54a039076d798123ffa108fff46c"
+
+[[projects]]
+  digest = "1:3cafc6a5a1b8269605d9df4c6956d43d8011fc57f266ca6b9d04da6c09dee548"
+  name = "github.com/mattn/go-sqlite3"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "25ecb14adfc7543176f7d85291ec7dba82c6f7e4"
+  version = "v1.9.0"
 
 [[projects]]
   digest = "1:c25289f43ac4a68d88b02245742347c94f1e108c534dda442188015ff80669b3"
@@ -76,6 +85,7 @@
     "github.com/gorilla/mux",
     "github.com/jinzhu/gorm",
     "github.com/jinzhu/gorm/dialects/mysql",
+    "github.com/jinzhu/gorm/dialects/sqlite",
     "gopkg.in/gormigrate.v1",
   ]
   solver-name = "gps-cdcl"
