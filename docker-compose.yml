@@ -4,7 +4,7 @@ services:
   portaserver:
     container_name: portaserver
     build: .
-    # image: dimdiden/portanizer_sop
+    # image: dimdiden/portanizer_go
     env_file:
       - portaserver.env
     ports:
