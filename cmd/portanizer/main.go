@@ -8,8 +8,6 @@ import (
 	"github.com/dimdiden/portanizer_go"
 	"github.com/dimdiden/portanizer_go/gorm"
 	"github.com/dimdiden/portanizer_go/server"
-	_ "github.com/jinzhu/gorm/dialects/mysql"
-	_ "github.com/jinzhu/gorm/dialects/sqlite"
 )
 
 var (

@@ -6,6 +6,8 @@ import (
 	"os"
 
 	"github.com/dimdiden/portanizer_go/gorm"
+	_ "github.com/jinzhu/gorm/dialects/mysql"
+	_ "github.com/jinzhu/gorm/dialects/sqlite"
 )
 
 const (
