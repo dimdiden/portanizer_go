@@ -93,7 +93,7 @@ func getOpt(opt string) string {
 	return val
 }
 
-func (c *Conf) OpenGormDB() (*gorm.DB, error) {
+func (c *Conf) openGormDB() (*gorm.DB, error) {
 	var cparams string
 
 	switch c.DBdriver {

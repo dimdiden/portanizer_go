@@ -19,9 +19,9 @@ func main() {
 	// Load the configuration either from environment or from the default values
 	c := NewConf()
 	fmt.Println("[[> configurator initiated...")
-	fmt.Print(c)
+	fmt.Println(c)
 
-	db, err := c.OpenGormDB()
+	db, err := c.openGormDB()
 	if err != nil {
 		log.Fatal(err)
 	}
