@@ -9,12 +9,12 @@ import (
 )
 
 type postHandler struct {
-	postRepo portanizer.PostRepo
+	repo portanizer.PostRepo
 }
 
 func (h *postHandler) Get(w http.ResponseWriter, r *http.Request) {
 	id := mux.Vars(r)["id"]
-	post, err := h.postRepo.GetByID(id)
+	post, err := h.repo.GetByID(id)
 	if err != nil {
 		renderJSON(w, err.Error(), http.StatusNotFound)
 		return
@@ -23,7 +23,7 @@ func (h *postHandler) Get(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *postHandler) GetList(w http.ResponseWriter, r *http.Request) {
-	posts, err := h.postRepo.GetList()
+	posts, err := h.repo.GetList()
 	if err != nil {
 		renderJSON(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -47,7 +47,7 @@ func (h *postHandler) Create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	post, err := h.postRepo.Create(tmp)
+	post, err := h.repo.Create(tmp)
 	if err != nil {
 		renderJSON(w, err.Error(), http.StatusBadRequest)
 		return
@@ -72,7 +72,7 @@ func (h *postHandler) Update(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	post, err := h.postRepo.Update(id, tmp)
+	post, err := h.repo.Update(id, tmp)
 	if err == portanizer.ErrNotFound {
 		renderJSON(w, err.Error(), http.StatusNotFound)
 		return
@@ -91,7 +91,7 @@ func (h *postHandler) PutTags(w http.ResponseWriter, r *http.Request) {
 		renderJSON(w, "Failed. Please check json syntax", http.StatusBadRequest)
 		return
 	}
-	post, err := h.postRepo.PutTags(id, tagids)
+	post, err := h.repo.PutTags(id, tagids)
 	if err == portanizer.ErrNotFound {
 		renderJSON(w, err.Error(), http.StatusNotFound)
 		return
@@ -105,7 +105,7 @@ func (h *postHandler) PutTags(w http.ResponseWriter, r *http.Request) {
 func (h *postHandler) Delete(w http.ResponseWriter, r *http.Request) {
 	id := mux.Vars(r)["id"]
 
-	if err := h.postRepo.Delete(id); err == portanizer.ErrNotFound {
+	if err := h.repo.Delete(id); err == portanizer.ErrNotFound {
 		renderJSON(w, err.Error(), http.StatusNotFound)
 		return
 	} else if err != nil {

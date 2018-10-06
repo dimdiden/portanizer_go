@@ -9,12 +9,12 @@ import (
 )
 
 type tagHandler struct {
-	tagRepo portanizer.TagRepo
+	repo portanizer.TagRepo
 }
 
 func (h *tagHandler) Get(w http.ResponseWriter, r *http.Request) {
 	id := mux.Vars(r)["id"]
-	tag, err := h.tagRepo.GetByID(id)
+	tag, err := h.repo.GetByID(id)
 	if err != nil {
 		renderJSON(w, err.Error(), http.StatusNotFound)
 		return
@@ -23,7 +23,7 @@ func (h *tagHandler) Get(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *tagHandler) GetList(w http.ResponseWriter, r *http.Request) {
-	tags, err := h.tagRepo.GetList()
+	tags, err := h.repo.GetList()
 	if err != nil {
 		renderJSON(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -47,7 +47,7 @@ func (h *tagHandler) Create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// Create Tag
-	tag, err := h.tagRepo.Create(tmp)
+	tag, err := h.repo.Create(tmp)
 	if err != nil {
 		renderJSON(w, err.Error(), http.StatusBadRequest)
 		return
@@ -72,7 +72,7 @@ func (h *tagHandler) Update(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// Create Tag
-	tag, err := h.tagRepo.Update(id, tmp)
+	tag, err := h.repo.Update(id, tmp)
 	if err == portanizer.ErrNotFound {
 		renderJSON(w, err.Error(), http.StatusNotFound)
 		return
@@ -86,7 +86,7 @@ func (h *tagHandler) Update(w http.ResponseWriter, r *http.Request) {
 func (h *tagHandler) Delete(w http.ResponseWriter, r *http.Request) {
 	id := mux.Vars(r)["id"]
 
-	if err := h.tagRepo.Delete(id); err == portanizer.ErrNotFound {
+	if err := h.repo.Delete(id); err == portanizer.ErrNotFound {
 		renderJSON(w, err.Error(), http.StatusNotFound)
 		return
 	} else if err != nil {
