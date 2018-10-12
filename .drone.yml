@@ -1,6 +1,5 @@
 workspace:
   base: /go
-  # path: src/github.com/dimdiden/portanizer_go
   path: portanizer_go
 
 pipeline:
@@ -11,12 +10,6 @@ pipeline:
       - go test -v github.com/dimdiden/portanizer_go/server
       - go vet
 
-  # build_linux_amd64:
-  #   image: golang:1.10.3
-  #   group: build
-  #   commands:
-  #     - make build_linux_amd64
-
   publish_linux_amd64:
     image: plugins/docker
     pull: true
@@ -24,7 +17,7 @@ pipeline:
     group: release
     repo: dimdiden/portanizer_go
     auto_tag: true
-    dockerfile: Dockerfile_mod
+    dockerfile: Dockerfile
     debug: true
     when:
       event: [ push, tag ]

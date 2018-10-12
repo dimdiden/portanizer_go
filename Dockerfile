@@ -1,13 +1,15 @@
-# https://gist.github.com/icambridge/163763cd1017d8a5319c0c48ec697969
-FROM golang:1.10.3
+FROM golang:1.11.1
 
 RUN mkdir -p /go/src/app
 WORKDIR /go/src/app
 
 ADD . /go/src/app
 
-RUN go get -u github.com/golang/dep/cmd/dep
-RUN dep ensure
+# Force the go compiler to use modules
+ENV GO111MODULE=on
+
+# Download all the related packages
+RUN go mod download
 
 # Build my app
 RUN go build -o portanizer cmd/portanizer/*
