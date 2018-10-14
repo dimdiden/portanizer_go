@@ -22,7 +22,7 @@ const (
 	DB_USER   = "root"
 	DB_PSWD   = ""
 
-	IS_DEBUG = "FALSE"
+	IS_DEBUG = "OFF"
 )
 
 type Conf struct {
@@ -49,14 +49,16 @@ var conflist = map[string]string{
 }
 
 func (c Conf) String() string {
-	buf := bytes.NewBufferString("[[> DEBUG - " + c.IsDebug + "\n")
-	if c.IsDebug == "TRUE" {
-		w := tabwriter.NewWriter(buf, 0, 0, 0, ' ', tabwriter.TabIndent|tabwriter.Debug)
-		fmt.Fprintf(w, "[[> running configuration:\n")
-		fmt.Fprintf(w, "APP_PORT:\t%v\nDB_HOST:\t%v\nDB_DRIVER:\t%v\nDB_NAME:\t%v\nDB_USER:\t%v\nDB_PSWD:\t%v\nIS_DEBUG:\t%v\n",
-			c.APPport, c.DBhost, c.DBdriver, c.DBname, c.DBuser, c.DBpswd, c.IsDebug)
-		w.Flush()
+	var buf bytes.Buffer
+	w := tabwriter.NewWriter(&buf, 0, 0, 1, ' ', tabwriter.TabIndent)
+	fmt.Fprintln(w, "[[> running configuration")
+	fmt.Fprint(w, "    IS_DEBUG:\t"+c.IsDebug)
+	if c.IsDebug == "ON" {
+		fmt.Fprintln(w)
+		fmt.Fprintf(w, "    APP_PORT:\t%v\n    DB_HOST:\t%v\n    DB_DRIVER:\t%v\n    DB_NAME:\t%v\n    DB_USER:\t%v\n    DB_PSWD:\t%v", // without \n because of w - specific writer
+			c.APPport, c.DBhost, c.DBdriver, c.DBname, c.DBuser, c.DBpswd)
 	}
+	w.Flush()
 	return buf.String()
 }
 
