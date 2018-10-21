@@ -55,10 +55,10 @@ var jwtMiddleware = jwtmiddleware.New(jwtmiddleware.Options{
 		return secret, nil
 	},
 	SigningMethod: jwt.SigningMethodHS256,
-	ErrorHandler:  OnError,
+	ErrorHandler:  onError,
 })
 
-func OnError(w http.ResponseWriter, r *http.Request, err string) {
+func onError(w http.ResponseWriter, r *http.Request, err string) {
 	renderJSON(w, err, http.StatusUnauthorized)
 }
 
