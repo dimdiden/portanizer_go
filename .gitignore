@@ -8,3 +8,4 @@ init.sql
 app
 cmd/portanizer/portanizer
 sqlite.db
+.DS_Store
