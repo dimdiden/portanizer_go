@@ -30,6 +30,15 @@ func RunMigrations(db *gorm.DB) error {
 				return tx.DropTable(&portanizer.Post{}).Error
 			},
 		},
+		{
+			ID: "add User migration",
+			Migrate: func(tx *gorm.DB) error {
+				return tx.AutoMigrate(&portanizer.User{}).Error
+			},
+			Rollback: func(tx *gorm.DB) error {
+				return tx.DropTable(&portanizer.User{}).Error
+			},
+		},
 	})
 	return m.Migrate()
 }

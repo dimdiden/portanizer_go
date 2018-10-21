@@ -36,3 +36,8 @@ type TagRepo interface {
 	Update(id string, tag Tag) (*Tag, error)
 	Delete(id string) error
 }
+
+type UserRepo interface {
+	Create(user User) (*User, error)
+	Exists(user User) bool
+}

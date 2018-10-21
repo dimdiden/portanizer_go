@@ -9,7 +9,11 @@ import (
 	"github.com/gorilla/mux"
 )
 
+var secret []byte
+
 type Server struct {
+	auth   *authHandler
+	user   *userHandler
 	post   *postHandler
 	tag    *tagHandler
 	router *mux.Router
@@ -29,15 +33,20 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 // NewServer will construct a Server and apply all of the necessary routes
-func New(pr portanizer.PostRepo, tr portanizer.TagRepo) *Server {
+func New(s string, pr portanizer.PostRepo, tr portanizer.TagRepo, ur portanizer.UserRepo) *Server {
 	server := Server{
 		post:   &postHandler{repo: pr},
 		tag:    &tagHandler{repo: tr},
+		user:   &userHandler{repo: ur},
+		auth:   &authHandler{repo: ur},
 		router: mux.NewRouter(),
 	}
 	server.postroutes()
 	server.tagroutes()
+	server.authroutes()
+	server.userroutes()
 
+	secret = []byte(s)
 	return &server
 }
 
@@ -46,7 +55,7 @@ func (s *Server) LogEnable() {
 }
 
 func (s *Server) postroutes() {
-	s.router.HandleFunc("/posts", s.post.GetList).Methods("GET")
+	s.router.Handle("/posts", jwtMiddleware.Handler(http.HandlerFunc(s.post.GetList))).Methods("GET")
 	s.router.HandleFunc("/posts", s.post.Create).Methods("POST")
 
 	s.router.HandleFunc("/posts/{id}", s.post.Get).Methods("GET")
@@ -63,4 +72,12 @@ func (s *Server) tagroutes() {
 	s.router.HandleFunc("/tags/{id}", s.tag.Get).Methods("GET")
 	s.router.HandleFunc("/tags/{id}", s.tag.Update).Methods("PATCH")
 	s.router.HandleFunc("/tags/{id}", s.tag.Delete).Methods("DELETE")
+}
+
+func (s *Server) userroutes() {
+	s.router.HandleFunc("/users", s.user.Register).Methods("POST")
+}
+
+func (s *Server) authroutes() {
+	s.router.HandleFunc("/login", s.auth.Login).Methods("POST")
 }

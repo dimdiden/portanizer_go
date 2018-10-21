@@ -5,14 +5,8 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/dimdiden/portanizer_go"
 	"github.com/dimdiden/portanizer_go/gorm"
 	"github.com/dimdiden/portanizer_go/server"
-)
-
-var (
-	postRepo portanizer.PostRepo
-	tagRepo  portanizer.TagRepo
 )
 
 func main() {
@@ -33,8 +27,14 @@ func main() {
 	// Log each sql query
 	db.LogMode(true)
 	// Init server, enable logs and run it
-	s := server.New(gorm.NewPostRepo(db), gorm.NewTagRepo(db))
+	s := server.New(
+		c.Secret,
+		gorm.NewPostRepo(db),
+		gorm.NewTagRepo(db),
+		gorm.NewUserRepo(db),
+	)
 	s.LogEnable()
+
 	fmt.Printf("[[> listening on %v port...", c.APPport)
 	log.Fatal(http.ListenAndServe(":"+c.APPport, s))
 }

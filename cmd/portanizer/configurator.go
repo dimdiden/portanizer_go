@@ -17,12 +17,13 @@ const (
 	APP_PORT = "8080"
 
 	DB_HOST   = "127.0.0.1"
-	DB_DRIVER = "mysql"
+	DB_DRIVER = "sqlite3"
 	DB_NAME   = "portanizer"
 	DB_USER   = "root"
 	DB_PSWD   = ""
 
-	IS_DEBUG = "OFF"
+	DEBUG  = "OFF"
+	SECRET = "SECRET_KEY"
 )
 
 type Conf struct {
@@ -35,7 +36,8 @@ type Conf struct {
 	DBuser   string
 	DBpswd   string
 
-	IsDebug string
+	Debug  string
+	Secret string
 }
 
 var conflist = map[string]string{
@@ -45,18 +47,19 @@ var conflist = map[string]string{
 	"DB_NAME":   DB_NAME,
 	"DB_USER":   DB_USER,
 	"DB_PSWD":   DB_PSWD,
-	"IS_DEBUG":  IS_DEBUG,
+	"DEBUG":     DEBUG,
+	"SECRET":    SECRET,
 }
 
 func (c Conf) String() string {
 	var buf bytes.Buffer
 	w := tabwriter.NewWriter(&buf, 0, 0, 1, ' ', tabwriter.TabIndent)
 	fmt.Fprintln(w, "[[> running configuration")
-	fmt.Fprint(w, "    IS_DEBUG:\t"+c.IsDebug)
-	if c.IsDebug == "ON" {
+	fmt.Fprint(w, "    DEBUG:\t"+c.Debug)
+	if c.Debug == "ON" {
 		fmt.Fprintln(w)
-		fmt.Fprintf(w, "    APP_PORT:\t%v\n    DB_HOST:\t%v\n    DB_DRIVER:\t%v\n    DB_NAME:\t%v\n    DB_USER:\t%v\n    DB_PSWD:\t%v", // without \n because of w - specific writer
-			c.APPport, c.DBhost, c.DBdriver, c.DBname, c.DBuser, c.DBpswd)
+		fmt.Fprintf(w, "    SECRET:\t%v\n    APP_PORT:\t%v\n    DB_HOST:\t%v\n    DB_DRIVER:\t%v\n    DB_NAME:\t%v\n    DB_USER:\t%v\n    DB_PSWD:\t%v", // without \n because of w - specific writer
+			c.Secret, c.APPport, c.DBhost, c.DBdriver, c.DBname, c.DBuser, c.DBpswd)
 	}
 	w.Flush()
 	return buf.String()
@@ -70,7 +73,8 @@ func NewDefaultConf() *Conf {
 		DBname:   conflist["DB_NAME"],
 		DBuser:   conflist["DB_USER"],
 		DBpswd:   conflist["DB_PSWD"],
-		IsDebug:  conflist["IS_DEBUG"],
+		Debug:    conflist["DEBUG"],
+		Secret:   conflist["SECRET"],
 	}
 }
 
@@ -82,7 +86,8 @@ func NewConf() *Conf {
 		DBname:   getOpt("DB_NAME"),
 		DBuser:   getOpt("DB_USER"),
 		DBpswd:   getOpt("DB_PSWD"),
-		IsDebug:  getOpt("IS_DEBUG"),
+		Debug:    getOpt("DEBUG"),
+		Secret:   getOpt("SECRET"),
 	}
 }
 
@@ -100,7 +105,9 @@ func (c *Conf) openGormDB() (*gorm.DB, error) {
 
 	switch c.DBdriver {
 	case "mysql":
-		cparams = fmt.Sprintf("%s:%s@tcp(%s:3306)/%s?charset=utf8&parseTime=True&loc=Local", c.DBuser, c.DBpswd, c.DBhost, c.DBname)
+		cparams = fmt.Sprintf(
+			"%s:%s@tcp(%s:3306)/%s?charset=utf8&parseTime=True&loc=Local",
+			c.DBuser, c.DBpswd, c.DBhost, c.DBname)
 	case "sqlite3":
 		cparams = "./sqlite.db"
 	default:
