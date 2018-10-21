@@ -44,7 +44,7 @@ func (h *authHandler) Login(w http.ResponseWriter, r *http.Request) {
 	// Sign the token with the secret
 	tokenString, err := token.SignedString(secret)
 	if err != nil {
-		renderJSON(w, tokenString, http.StatusOK)
+		renderJSON(w, err.Error(), http.StatusInternalServerError)
 	}
 	// Finally, response with token
 	renderJSON(w, tokenString, http.StatusOK)
@@ -55,7 +55,14 @@ var jwtMiddleware = jwtmiddleware.New(jwtmiddleware.Options{
 		return secret, nil
 	},
 	SigningMethod: jwt.SigningMethodHS256,
+	ErrorHandler:  OnError,
 })
+
+func OnError(w http.ResponseWriter, r *http.Request, err string) {
+	renderJSON(w, err, http.StatusUnauthorized)
+}
+
+// jwtMiddleware.Options.ErrorHandler = OnError
 
 // Examples of middlewares
 
