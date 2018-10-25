@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/dimdiden/portanizer_go"
+	portanizer "github.com/dimdiden/portanizer_go"
 	"github.com/gorilla/mux"
 )
 
