@@ -21,8 +21,9 @@ func (h *userHandler) Register(w http.ResponseWriter, r *http.Request) {
 		renderJSON(w, err.Error(), http.StatusBadRequest)
 		return
 	}
-	if !tmp.IsValid() {
-		renderJSON(w, portanizer.ErrEmpty.Error(), http.StatusBadRequest)
+
+	if err := tmp.IsValid(); err != nil {
+		renderJSON(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
