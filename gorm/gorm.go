@@ -9,6 +9,7 @@ import (
 var Open = gorm.Open
 
 type DB = gorm.DB
+type Logger = gorm.Logger
 
 func RunMigrations(db *gorm.DB) error {
 	m := gormigrate.New(db, gormigrate.DefaultOptions, []*gormigrate.Migration{
@@ -32,6 +33,15 @@ func RunMigrations(db *gorm.DB) error {
 		},
 		{
 			ID: "add User migration",
+			Migrate: func(tx *gorm.DB) error {
+				return tx.AutoMigrate(&portanizer.User{}).Error
+			},
+			Rollback: func(tx *gorm.DB) error {
+				return tx.DropTable(&portanizer.User{}).Error
+			},
+		},
+		{
+			ID: "Add Tokens for User",
 			Migrate: func(tx *gorm.DB) error {
 				return tx.AutoMigrate(&portanizer.User{}).Error
 			},
