@@ -39,5 +39,7 @@ type TagRepo interface {
 
 type UserRepo interface {
 	Create(user User) (*User, error)
-	Exists(user User) bool
+	Exists(user *User) error
+	Valid(user *User) error
+	Refresh(user *User) error
 }

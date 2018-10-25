@@ -1,5 +1,7 @@
 package portanizer
 
+import "errors"
+
 type Post struct {
 	ID   uint
 	Name string `gorm:"unique;not null"`
@@ -29,12 +31,13 @@ func (t *Tag) IsValid() bool {
 type User struct {
 	ID       uint
 	Email    string `gorm:"unique;not null"`
-	Password string `gorm:"unique;not null"`
+	Password string `gorm:"not null"`
+	RToken   string `gorm:"unique"`
 }
 
-func (u *User) IsValid() bool {
+func (u *User) IsValid() error {
 	if u.Email == "" || u.Password == "" {
-		return false
+		return errors.New("email or password is empty")
 	}
-	return true
+	return nil
 }
