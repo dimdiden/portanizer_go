@@ -1,3 +1,5 @@
+cmd/portanizer/debug
+.vscode/
 vendor/
 mysql/
 secrets.json
