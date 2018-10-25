@@ -1,7 +1,7 @@
 module github.com/dimdiden/portanizer_go
 
 require (
-	cloud.google.com/go v0.30.0 // indirect
+	cloud.google.com/go v0.31.0 // indirect
 	github.com/auth0/go-jwt-middleware v0.0.0-20170425171159-5493cabe49f7
 	github.com/codegangsta/negroni v1.0.0 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
@@ -24,7 +24,7 @@ require (
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/smartystreets/assertions v0.0.0-20180927180507-b2de0cb4f26d // indirect
 	github.com/smartystreets/goconvey v0.0.0-20180222194500-ef6db91d284a // indirect
-	golang.org/x/crypto v0.0.0-20181015023909-0c41d7ab0a0e // indirect
+	golang.org/x/crypto v0.0.0-20181025113841-85e1b3f9139a
 	google.golang.org/appengine v1.2.0 // indirect
 	gopkg.in/gormigrate.v1 v1.2.1
 	gopkg.in/stretchr/testify.v1 v1.2.2 // indirect
