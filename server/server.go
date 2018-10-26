@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-	"os"
 
 	"github.com/dimdiden/portanizer_go"
 	"github.com/gorilla/handlers"
@@ -59,7 +58,7 @@ func (s *Server) Run(port string) error {
 }
 
 func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	handler := handlers.LoggingHandler(os.Stdout, s.router)
+	handler := handlers.LoggingHandler(s.logout, s.router)
 	handler.ServeHTTP(w, r)
 }
 
