@@ -16,32 +16,32 @@ import (
 )
 
 const (
-	APP_PORT = "8080"
+	appPort = "8080"
 
-	DB_HOST   = "127.0.0.1"
-	DB_DRIVER = "sqlite3"
-	DB_NAME   = "portanizer"
-	DB_USER   = "root"
-	DB_PSWD   = ""
+	dbHost   = "127.0.0.1"
+	dbDriver = "sqlite3"
+	dbName   = "portanizer"
+	dbUser   = "root"
+	dbPswd   = ""
 
-	DEBUG   = "OFF"
-	ASECRET = "ACCESS_SECRET_KEY"
-	RSECRET = "REFRESH_SECRET_KEY"
+	debug   = "OFF"
+	asecret = "ACCESS_SECRET_KEY"
+	rsecret = "REFRESH_SECRET_KEY"
 )
 
 var conflist = map[string]string{
-	"APP_PORT":  APP_PORT,
-	"DB_HOST":   DB_HOST,
-	"DB_DRIVER": DB_DRIVER,
-	"DB_NAME":   DB_NAME,
-	"DB_USER":   DB_USER,
-	"DB_PSWD":   DB_PSWD,
-	"DEBUG":     DEBUG,
-	"ASECRET":   ASECRET,
-	"RSECRET":   RSECRET,
+	"APP_PORT":  appPort,
+	"DB_HOST":   dbHost,
+	"DB_DRIVER": dbDriver,
+	"DB_NAME":   dbName,
+	"DB_USER":   dbUser,
+	"DB_PSWD":   dbPswd,
+	"DEBUG":     debug,
+	"ASECRET":   asecret,
+	"RSECRET":   rsecret,
 }
 
-type Conf struct {
+type conf struct {
 	Debug string
 	// Host and port to run the server with
 	APPport string
@@ -58,7 +58,7 @@ type Conf struct {
 	logout io.Writer
 }
 
-func (c Conf) String() string {
+func (c conf) String() string {
 	var buf bytes.Buffer
 	w := tabwriter.NewWriter(&buf, 0, 0, 1, ' ', tabwriter.TabIndent)
 	fmt.Fprintln(w, "[[> running configuration")
@@ -72,8 +72,8 @@ func (c Conf) String() string {
 	return buf.String()
 }
 
-func newConf() *Conf {
-	conf := &Conf{
+func newConf() *conf {
+	conf := &conf{
 		APPport:  getOpt("APP_PORT"),
 		DBhost:   getOpt("DB_HOST"),
 		DBdriver: getOpt("DB_DRIVER"),
@@ -99,7 +99,7 @@ func getOpt(opt string) string {
 	return val
 }
 
-func (c *Conf) openGormDB() (*gorm.DB, error) {
+func (c *conf) openGormDB() (*gorm.DB, error) {
 	var cparams string
 	// get the connection string
 	switch c.DBdriver {
@@ -117,7 +117,7 @@ func (c *Conf) openGormDB() (*gorm.DB, error) {
 	if err != nil {
 		return nil, fmt.Errorf("unable to open app db: %v", err)
 	}
-	logger := gorm.Logger{log.New(c.logout, "\r\n", 0)}
+	logger := gorm.Logger{LogWriter: log.New(c.logout, "\r\n", 0)}
 	db.SetLogger(logger)
 	if c.Debug == "ON" {
 		db.LogMode(true)
@@ -126,7 +126,7 @@ func (c *Conf) openGormDB() (*gorm.DB, error) {
 	return db, nil
 }
 
-func (c *Conf) openGormServer(db *gorm.DB) *server.Server {
+func (c *conf) openGormServer(db *gorm.DB) *server.Server {
 	server.ASecret = []byte(c.ASecret)
 	server.RSecret = []byte(c.RSecret)
 	s := server.New(
