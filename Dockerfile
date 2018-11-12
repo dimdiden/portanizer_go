@@ -12,5 +12,5 @@ ENV GO111MODULE=on
 RUN go mod download
 
 # Build my app
-RUN go build -o portanizer cmd/portanizer/*
+RUN go build -o portanizer cmd/portanizer/*.go
 CMD ["./portanizer"]

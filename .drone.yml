@@ -7,7 +7,8 @@ pipeline:
     image: golang:1.11.1
     commands:
       - go mod download
-      - go test -v github.com/dimdiden/portanizer_go/server
+      # - go test -v github.com/dimdiden/portanizer_go/server
+      - go test -v ./...
       - go vet
 
   publish_linux_amd64:
