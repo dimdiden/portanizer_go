@@ -52,8 +52,8 @@ type conf struct {
 	DBuser   string
 	DBpswd   string
 
-	ASecret string
-	RSecret string
+	ASecret []byte
+	RSecret []byte
 
 	logout io.Writer
 }
@@ -81,8 +81,8 @@ func newConf() *conf {
 		DBuser:   getOpt("DB_USER"),
 		DBpswd:   getOpt("DB_PSWD"),
 		Debug:    getOpt("DEBUG"),
-		ASecret:  getOpt("ASECRET"),
-		RSecret:  getOpt("RSECRET"),
+		ASecret:  []byte(getOpt("ASECRET")),
+		RSecret:  []byte(getOpt("RSECRET")),
 		logout:   os.Stdout,
 	}
 	fmt.Fprintln(conf.logout, "[[> configurator initiated...")
@@ -127,9 +127,9 @@ func (c *conf) openGormDB() (*gorm.DB, error) {
 }
 
 func (c *conf) openGormServer(db *gorm.DB) *server.Server {
-	server.ASecret = []byte(c.ASecret)
-	server.RSecret = []byte(c.RSecret)
 	s := server.New(
+		c.ASecret,
+		c.RSecret,
 		c.logout,
 		gorm.NewPostRepo(db),
 		gorm.NewTagRepo(db),

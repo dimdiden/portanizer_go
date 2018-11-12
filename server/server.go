@@ -15,15 +15,11 @@ const (
 	rtokenExp = 4
 )
 
-// ASecret is used to issue access tokens
-var ASecret []byte
-
-// RSecret is used to issue access tokens
-var RSecret []byte
-
 // Server is the Rest API Server
 type Server struct {
-	auth   *authHandler
+	asecret []byte
+	rsecret []byte
+	// auth    *authHandler
 	user   *userHandler
 	post   *postHandler
 	tag    *tagHandler
@@ -33,18 +29,16 @@ type Server struct {
 }
 
 // New will construct a Server and apply all of the necessary routes
-func New(logout io.Writer, pr portanizer.PostRepo, tr portanizer.TagRepo, ur portanizer.UserRepo) *Server {
+func New(as, rs []byte, logout io.Writer, pr portanizer.PostRepo, tr portanizer.TagRepo, ur portanizer.UserRepo) *Server {
 	server := Server{
 		post:   &postHandler{repo: pr},
 		tag:    &tagHandler{repo: tr},
-		user:   &userHandler{repo: ur},
-		auth:   &authHandler{repo: ur},
+		user:   newUserHandler(as, rs, ur),
 		router: mux.NewRouter(),
 		logout: logout,
 	}
 	server.postroutes()
 	server.tagroutes()
-	server.authroutes()
 	server.userroutes()
 
 	return &server
@@ -64,41 +58,39 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 func (s *Server) postroutes() {
 	s.router.Handle("/posts",
-		jwtMiddleware.Handler(http.HandlerFunc(s.post.GetList))).Methods("GET")
+		s.user.jwtMiddleware.Handler(http.HandlerFunc(s.post.GetList))).Methods("GET")
 	s.router.Handle("/posts",
-		jwtMiddleware.Handler(http.HandlerFunc(s.post.Create))).Methods("POST")
+		s.user.jwtMiddleware.Handler(http.HandlerFunc(s.post.Create))).Methods("POST")
 
 	s.router.Handle("/posts/{id}",
-		jwtMiddleware.Handler(http.HandlerFunc(s.post.Get))).Methods("GET")
+		s.user.jwtMiddleware.Handler(http.HandlerFunc(s.post.Get))).Methods("GET")
 	s.router.Handle("/posts/{id}",
-		jwtMiddleware.Handler(http.HandlerFunc(s.post.Update))).Methods("PATCH")
+		s.user.jwtMiddleware.Handler(http.HandlerFunc(s.post.Update))).Methods("PATCH")
 	s.router.Handle("/posts/{id}",
-		jwtMiddleware.Handler(http.HandlerFunc(s.post.Delete))).Methods("DELETE")
-
+		s.user.jwtMiddleware.Handler(http.HandlerFunc(s.post.Delete))).Methods("DELETE")
 	s.router.Handle("/posts/{id}/tags",
-		jwtMiddleware.Handler(http.HandlerFunc(s.post.PutTags))).Methods("PUT")
+		s.user.jwtMiddleware.Handler(http.HandlerFunc(s.post.PutTags))).Methods("PUT")
 }
 
 func (s *Server) tagroutes() {
 	s.router.Handle("/tags",
-		jwtMiddleware.Handler(http.HandlerFunc(s.tag.GetList))).Methods("GET")
+		s.user.jwtMiddleware.Handler(http.HandlerFunc(s.tag.GetList))).Methods("GET")
 	s.router.Handle("/tags",
-		jwtMiddleware.Handler(http.HandlerFunc(s.tag.Create))).Methods("POST")
+		s.user.jwtMiddleware.Handler(http.HandlerFunc(s.tag.Create))).Methods("POST")
 
 	s.router.Handle("/tags/{id}",
-		jwtMiddleware.Handler(http.HandlerFunc(s.tag.Get))).Methods("GET")
+		s.user.jwtMiddleware.Handler(http.HandlerFunc(s.tag.Get))).Methods("GET")
 	s.router.Handle("/tags/{id}",
-		jwtMiddleware.Handler(http.HandlerFunc(s.tag.Update))).Methods("PATCH")
+		s.user.jwtMiddleware.Handler(http.HandlerFunc(s.tag.Update))).Methods("PATCH")
 	s.router.Handle("/tags/{id}",
-		jwtMiddleware.Handler(http.HandlerFunc(s.tag.Delete))).Methods("DELETE")
+		s.user.jwtMiddleware.Handler(http.HandlerFunc(s.tag.Delete))).Methods("DELETE")
 }
 
 func (s *Server) userroutes() {
-	s.router.HandleFunc("/users", s.user.Register).Methods("POST")
-}
-
-func (s *Server) authroutes() {
-	s.router.HandleFunc("/login", s.auth.Login).Methods("POST")
-	s.router.Handle("/refresh",
-		jwtMiddleware.Handler(http.HandlerFunc(s.auth.Refresh))).Methods("POST")
+	s.router.Handle("/users", s.user.SignUp()).Methods("POST")
+	s.router.Handle("/users/signin", s.user.SignIn()).Methods("POST")
+	s.router.Handle("/users/refresh",
+		s.user.jwtMiddleware.Handler(s.user.Refresh())).Methods("POST")
+	s.router.Handle("/users/signout",
+		s.user.jwtMiddleware.Handler(s.user.SignOut())).Methods("POST")
 }

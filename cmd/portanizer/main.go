@@ -14,10 +14,10 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-
 	defer db.Close()
 	// Migrate any changed in structs to DB schema
 	gorm.RunMigrations(db)
+
 	// Init server and run it
 	s := c.openGormServer(db)
 	log.Fatal(s.Run(c.APPport))

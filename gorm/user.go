@@ -10,19 +10,20 @@ type userRepo struct {
 	DB *gorm.DB
 }
 
+// NewUserRepo returns user repository implementation in gorm
 func NewUserRepo(db *gorm.DB) portanizer.UserRepo {
 	return &userRepo{DB: db}
 }
 
-func (r *userRepo) Exists(user *portanizer.User) error {
-	plainPwd := user.Password
-	if r.DB.Where("email = ?", user.Email).First(&user).RecordNotFound() {
-		return portanizer.ErrNotFound
+func (r *userRepo) GetByCreds(email, pwd string) (*portanizer.User, error) {
+	var user portanizer.User
+	if r.DB.Where("email = ?", email).First(&user).RecordNotFound() {
+		return nil, portanizer.ErrNotFound
 	}
-	if err := comparePasswords(user.Password, plainPwd); err != nil {
-		return err
+	if err := comparePasswords(user.Password, pwd); err != nil {
+		return nil, portanizer.ErrAuth
 	}
-	return nil
+	return &user, nil
 }
 
 func (r *userRepo) Create(user portanizer.User) (*portanizer.User, error) {
@@ -48,15 +49,23 @@ func (r *userRepo) Refresh(user *portanizer.User) error {
 	return nil
 }
 
-func (r *userRepo) Valid(user *portanizer.User) error {
-	if r.DB.First(&user, "id = ? AND r_token = ?", user.ID, user.RToken).RecordNotFound() {
+func (r *userRepo) EmptyRToken(id string) error {
+	var user portanizer.User
+	if r.DB.First(&user, "id = ?", id).RecordNotFound() {
 		return portanizer.ErrNotFound
 	}
-	err := r.Refresh(user)
-	if err != nil {
+	if err := r.DB.Model(&user).Update("r_token", "").Error; err != nil {
 		return err
 	}
 	return nil
+}
+
+func (r *userRepo) GetByID(id string) (*portanizer.User, error) {
+	var user portanizer.User
+	if r.DB.First(&user, "id = ?", id).RecordNotFound() {
+		return nil, portanizer.ErrNotFound
+	}
+	return &user, nil
 }
 
 func hashAndSalt(pwd string) ([]byte, error) {

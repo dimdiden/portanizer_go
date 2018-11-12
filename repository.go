@@ -12,6 +12,8 @@ var (
 	ErrExists = errors.New("Record already exists in the database")
 
 	ErrEmpty = errors.New("Record has empty field")
+
+	ErrAuth = errors.New("Authentication failed")
 )
 
 type Assigner interface {
@@ -38,8 +40,9 @@ type TagRepo interface {
 }
 
 type UserRepo interface {
+	GetByID(id string) (*User, error)
+	GetByCreds(email, pwd string) (*User, error)
 	Create(user User) (*User, error)
-	Exists(user *User) error
-	Valid(user *User) error
+	EmptyRToken(id string) error
 	Refresh(user *User) error
 }
