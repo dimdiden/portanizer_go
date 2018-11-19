@@ -1,4 +1,5 @@
 cmd/portanizer/debug
+portanizer.db
 .vscode/
 vendor/
 mysql/
