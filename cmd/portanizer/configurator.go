@@ -108,7 +108,8 @@ func (c *conf) openGormDB() (*gorm.DB, error) {
 			"%s:%s@tcp(%s:3306)/%s?charset=utf8&parseTime=True&loc=Local",
 			c.DBuser, c.DBpswd, c.DBhost, c.DBname)
 	case "sqlite3":
-		cparams = "./sqlite.db"
+		// cparams = "./sqlite.db"
+		cparams = c.DBname + ".db"
 	default:
 		return nil, errors.New("unsupported dialect for database")
 	}

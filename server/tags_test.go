@@ -6,68 +6,66 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
-
-	"github.com/dimdiden/portanizer_go"
-	"github.com/dimdiden/portanizer_go/mock"
-	"github.com/gorilla/mux"
 )
 
-var as = []byte("ASECRET")
-var rs = []byte("RSECRET")
+// var as = []byte("ASECRET")
+// var rs = []byte("RSECRET")
 
-func NewTagServer(tr portanizer.TagRepo, ur portanizer.UserRepo) *Server {
-	server := Server{
-		user:   newUserHandler(as, rs, ur),
-		tag:    &tagHandler{repo: tr},
-		router: mux.NewRouter(),
-		logout: ioutil.Discard,
-	}
-	server.tagroutes()
-	return &server
-}
+// func NewTagServer(tr portanizer.TagRepo, ur portanizer.UserRepo) *Server {
+// 	server := Server{
+// 		user:   newUserHandler(as, rs, ur),
+// 		tag:    &tagHandler{repo: tr},
+// 		router: mux.NewRouter(),
+// 		logout: ioutil.Discard,
+// 	}
+// 	server.tagroutes()
+// 	return &server
+// }
 
-func TestGetTagHandlers(t *testing.T) {
-	t.Run("GetTag", testGetTag)
-	// t.Run("GetTagList", testGetTagList)
-}
+// func TestGetTagHandlers(t *testing.T) {
+// 	t.Run("GetTag", testGetTag)
+// 	// t.Run("GetTagList", testGetTagList)
+// }
 
-func testGetTag(t *testing.T) {
+// func testGetTag(t *testing.T) {
 
-	var tr mock.TagRepo
-	var ur mock.UserRepo
+// 	var tr mock.TagRepo
+// 	var ur mock.UserRepo
 
-	tr.GetIdFn = func(id string) (*portanizer.Tag, error) {
-		if id != "100" {
-			t.Fatalf("unexpected id: %v", id)
-		}
-		return &portanizer.Tag{ID: 100, Name: "Tag100"}, nil
-	}
+// 	tr.GetIdFn = func(id string) (*portanizer.Tag, error) {
+// 		if id != "100" {
+// 			t.Fatalf("unexpected id: %v", id)
+// 		}
+// 		return &portanizer.Tag{ID: 100, Name: "Tag100"}, nil
+// 	}
 
-	ur.RefreshFn = func(user *portanizer.User) error {
-		return nil
-	}
+// 	ur.RefreshFn = func(user *portanizer.User) error {
+// 		return nil
+// 	}
 
-	s := NewTagServer(&tr, &ur)
+// 	s := NewTagServer(&tr, &ur)
 
-	user := &portanizer.User{ID: 1, Email: "dimdiden@gmail.com", Password: "123"}
+// 	user := &portanizer.User{ID: 1, Email: "dimdiden@gmail.com", Password: "123"}
 
-	tp, err := s.user.issueTokens(user)
-	ok(t, err)
-	// asecret := "WRONGSECRET.WRONGSECRET.WRONGSECRET"
+// 	tp, err := s.user.issueTokens(user)
+// 	ok(t, err)
+// 	// asecret := "WRONGSECRET.WRONGSECRET.WRONGSECRET"
 
-	w := httptest.NewRecorder()
-	r, err := http.NewRequest("GET", "/tags/100", nil)
-	ok(t, err)
-	r.Header.Add("Authorization", "Bearer "+tp.AToken)
-	s.ServeHTTP(w, r)
+// 	w := httptest.NewRecorder()
+// 	r, err := http.NewRequest("GET", "/tags/100", nil)
+// 	ok(t, err)
+// 	r.Header.Add("Authorization", "Bearer "+tp.AToken)
+// 	s.ServeHTTP(w, r)
 
-	ok(t, err)
-	equals(t, `{"ID":100,"Name":"Tag100"}`, w)
+// 	ok(t, err)
+// 	equals(t, `{"ID":100,"Name":"Tag100"}`, w)
 
-	if !tr.GetIdInvoked {
-		t.Fatal("expected TagStore to be invoked")
-	}
-}
+// 	if !tr.GetIdInvoked {
+// 		t.Fatal("expected TagStore to be invoked")
+// 	}
+// }
+
+// =====================
 
 // func TestGetTagHandlers(t *testing.T) {
 // 	t.Run("GetTag", testGetTag)
